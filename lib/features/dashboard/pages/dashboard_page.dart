@@ -13,13 +13,6 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   String? selectedItem = 'Today';
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   api.generateAuthToken(context);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

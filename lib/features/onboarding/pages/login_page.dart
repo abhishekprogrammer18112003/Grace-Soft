@@ -283,15 +283,14 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   void _login() {
-    // onboarding.generateAuthToken(context);
     // setState(() {
     //   _isloading = true;
     // });
-    CustomNavigator.pushReplace(context, AppPages.navigationBar);
     // Timer(const Duration(seconds: 3), () {
     //   Get.off(const BottomNavigationBarWidget());
     // });
-    // if (_formKey.currentState!.validate()) {
-    // }
+    if (_formKey.currentState!.validate()) {
+      CustomNavigator.pushReplace(context, AppPages.navigationBar);
+    }
   }
 }
