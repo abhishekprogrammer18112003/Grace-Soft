@@ -20,16 +20,17 @@ class _ArrivalPageState extends State<ArrivalPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         title: Text('${widget.arguements['day']} Arrivals',
-            style: TextStyle(fontWeight: FontWeight.w300, color: Colors.white)),
+            style: const TextStyle(
+                fontWeight: FontWeight.w300, color: Colors.white)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: ListView.builder(
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              return const MemberDetailsCardWidget();
-            }),
-      ),
+      // body: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+      //   child: ListView.builder(
+      //       itemCount: 6,
+      //       itemBuilder: (context, index) {
+      //         return const MemberDetailsCardWidget();
+      //       }),
+      // ),
     );
   }
 }
