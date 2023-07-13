@@ -1,12 +1,14 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
-import 'package:gracesoft/route/app_pages.dart';
-import 'package:gracesoft/route/custom_navigator.dart';
+import 'dart:convert';
 
 class ReservationDetailsCardWidget extends StatefulWidget {
-  const ReservationDetailsCardWidget({super.key});
+  dynamic reservationData;
+  ReservationDetailsCardWidget({super.key, required this.reservationData});
 
   @override
   State<ReservationDetailsCardWidget> createState() =>
@@ -15,6 +17,23 @@ class ReservationDetailsCardWidget extends StatefulWidget {
 
 class _ReservationDetailsCardWidgetState
     extends State<ReservationDetailsCardWidget> {
+  String? ArrDate;
+  String? DeptDate;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    String arrival = widget.reservationData["ArrDate"];
+    List<String> arrDate = arrival.split('T');
+    print(arrDate[0]);
+    ArrDate = arrDate[0];
+
+    String departure = widget.reservationData["DeptDate"];
+    List<String> deptDate = departure.split('T');
+    DeptDate = deptDate[0];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -39,32 +58,31 @@ class _ReservationDetailsCardWidgetState
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildResTag(),
-                  // SizedBox(width: Get.width * 0.04),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildNamePersonInfoRow(),
-                      const SizedBox(height: 5),
-                      _buildArrivalDeparture(),
-                      //icon for arrival and departure
-                      const SizedBox(height: 3),
-
-                      _buildDates(),
-                      //dates
-
-                      SizedBox(height: Get.height * 0.007),
-
-                      //Rooom no.
-                      _buildRoomNumber(),
-                    ],
-                  )
-                ],
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildResTag(),
+                    SizedBox(width: Get.width * 0.03),
+                    Container(
+                      width: Get.width * 0.7,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildNamePersonInfoRow(),
+                          const SizedBox(height: 5),
+                          _buildArrival(),
+                          const SizedBox(height: 3),
+                          _buildDates(),
+                          SizedBox(height: Get.height * 0.007),
+                          _buildRoomNumber(),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
@@ -75,7 +93,10 @@ class _ReservationDetailsCardWidgetState
                 )),
               ),
               const SizedBox(height: 1),
-              _buildCardFooter(),
+              Container(
+                // color: Colors.blue,
+                child: _buildCardFooter(),
+              )
             ],
           ),
         ),
@@ -86,15 +107,15 @@ class _ReservationDetailsCardWidgetState
   _buildResTag() => Container(
         height: Get.height * 0.1,
         width: Get.width * 0.1,
-        color: Colors.black87,
+        color: Colors.black54,
         child: RotatedBox(
           quarterTurns: -1,
           child: Center(
             child: RichText(
-              text: const TextSpan(
-                text: '4127',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+              text: TextSpan(
+                text: widget.reservationData["ConfirmNum"].toString(),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -103,63 +124,74 @@ class _ReservationDetailsCardWidgetState
 
   _buildNamePersonInfoRow() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            "Mr. Manohar Mathew",
-            style: TextStyle(
-                fontWeight: FontWeight.w900,
-                color: AppColors.primary,
-                fontSize: 15),
+          SizedBox(
+            child: Text(
+              " ${widget.reservationData["FullName"].toString()}",
+              style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.primary,
+                  fontSize: 17),
+            ),
           ),
           SizedBox(
-            width: Get.width * 0.19,
-          ),
-          GestureDetector(
-              onTap: () {
-                CustomNavigator.pushTo(context, AppPages.personDetailsPage);
-              },
-              child: const Icon(Icons.person)),
-          const SizedBox(width: 6),
-          GestureDetector(onTap: () {}, child: const Icon(Icons.more_vert)),
+              child: Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Row(
+              children: [
+                const Icon(Icons.person),
+                const SizedBox(width: 2),
+                Text(widget.reservationData["Guests"].toString())
+              ],
+            ),
+          ))
         ],
       );
-  _buildArrivalDeparture() => Row(
+  _buildArrival() => const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.share_arrival_time),
-          const SizedBox(width: 8),
-          const Text(
-            "Arrival",
-            style: TextStyle(
-                // color: Colors.white,
-                fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Icon(Icons.share_arrival_time),
+              SizedBox(width: 5),
+              Text(
+                "Arrival",
+                style: TextStyle(
+                    // color: Colors.white,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
-          SizedBox(
-            width: Get.width * 0.27,
-          ),
-          const Icon(Icons.departure_board),
-          const SizedBox(width: 8),
-          const Text(
-            "Departure",
-            style: TextStyle(
-                // color: Colors.white,
-                fontWeight: FontWeight.w600),
-          ),
+          Padding(
+            padding: EdgeInsets.only(right: 50.0),
+            child: Row(
+              children: [
+                Icon(Icons.departure_board),
+                SizedBox(width: 5),
+                Text(
+                  "Departure",
+                  style: TextStyle(
+                      // color: Colors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          )
         ],
       );
+
   _buildDates() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // const SizedBox(),
+          Text("  ${ArrDate}"),
           const SizedBox(width: 10),
-          const Text("05/29/2023"),
-          SizedBox(
-            width: Get.width * 0.25,
+          Padding(
+            padding: const EdgeInsets.only(right: 50.0),
+            child: Text("${DeptDate}"),
           ),
-          const SizedBox(width: 10),
-          const Text("05/31/2023"),
         ],
       );
 
@@ -167,7 +199,7 @@ class _ReservationDetailsCardWidgetState
         children: [
           const Icon(Icons.door_back_door_outlined),
           Text(
-            "  Country Inn Suite Type 54",
+            " ${widget.reservationData["RoomNames"]}",
             style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                 .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
           ),
@@ -180,19 +212,45 @@ class _ReservationDetailsCardWidgetState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("USD 30",
-                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                    .copyWith(fontSize: 14, fontWeight: FontWeight.w800)),
-            SizedBox(width: Get.width * 0.3),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text("Post Tax Total: ",
+                        style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                            .copyWith(
+                                fontSize: 14, fontWeight: FontWeight.w800)),
+                    Text(widget.reservationData["PostTaxTotal"].toString()),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text("Amount Paid : ",
+                        style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                            .copyWith(
+                                fontSize: 14, fontWeight: FontWeight.w800)),
+                    Text(widget.reservationData["AmountPaid"].toString()),
+                  ],
+                ),
+              ],
+            ),
+
+            // SizedBox(width: Get.width * 0.24),
             Container(
               height: 30,
-              width: 70,
-              color: Colors.green,
-              child: const Center(
+              width: 100,
+              color: widget.reservationData["Status"] == "CANCELLED"
+                  ? Colors.red
+                  : widget.reservationData["Status"] != "Confirmed"
+                      ? Colors.blue
+                      : Colors.green,
+              child: Center(
                   child: Text(
-                "Booked",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                widget.reservationData["Status"],
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700),
               )),
             )
           ],

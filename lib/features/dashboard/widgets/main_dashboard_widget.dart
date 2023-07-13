@@ -1,31 +1,35 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
+import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_icons.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 import 'package:gracesoft/features/dashboard/widgets/dashboard_card_widget.dart';
 import 'package:gracesoft/route/app_pages.dart';
 import 'package:gracesoft/route/custom_navigator.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class DashboardWidget extends StatefulWidget {
-  String arrivalCount;
-  String departureCount;
-  String stayoverCount;
-  String checkedinCount;
+  int arrivalCount;
+  int departureCount;
+  int stayoverCount;
+  // String checkedinCount;
 
-  String occupiedCount;
-  String blockedCount;
-  String vacantCount;
+  int bookedCount;
+  int blockedCount;
+  int vacantCount;
   String day;
 
   DashboardWidget(
       {super.key,
       required this.arrivalCount,
       required this.blockedCount,
-      required this.checkedinCount,
+      // required this.checkedinCount,
       required this.day,
       required this.departureCount,
-      required this.occupiedCount,
+      required this.bookedCount,
       required this.stayoverCount,
       required this.vacantCount});
 
@@ -34,6 +38,19 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('========dashboard widget===========');
+    print(widget.arrivalCount);
+    print(widget.departureCount);
+    print(widget.bookedCount);
+    print(widget.vacantCount);
+    print(widget.blockedCount);
+    print(widget.stayoverCount);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -46,10 +63,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             const SizedBox(height: 10),
             _buildOccupiedBlockedVacant(),
             const SizedBox(height: 20),
-            _buildArrivalDepartureRow(),
+            _buildArrivalDepartureStayoverRow(),
             const SizedBox(height: 20),
-            _buildStayOverCheckedInRow(),
-            const SizedBox(height: 30),
+            _buildCountDataWithPiechart(),
           ],
         ),
       ),
@@ -90,7 +106,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "${widget.occupiedCount} / ${widget.blockedCount} / ${widget.vacantCount}",
+                      "${widget.bookedCount} / ${widget.blockedCount} / ${widget.vacantCount}",
                       style: AppTextStyles.textStyles_Puritan_30_400_Secondary
                           .copyWith(
                               fontSize: 20,
@@ -114,7 +130,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         ),
       );
 
-  _buildArrivalDepartureRow() => Row(
+  _buildArrivalDepartureStayoverRow() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
@@ -138,12 +154,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 count: widget.departureCount,
                 image: AppIcons.departure,
               )),
-        ],
-      );
-
-  _buildStayOverCheckedInRow() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
           GestureDetector(
               onTap: () {
                 CustomNavigator.pushTo(context, AppPages.stayover,
@@ -154,58 +164,131 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   image: AppIcons.stayover,
                   count: widget.stayoverCount,
                   colorname: Colors.blue)),
-          GestureDetector(
-            onTap: () {
-              CustomNavigator.pushTo(context, AppPages.checkedin,
-                  arguments: {'day': widget.day});
-            },
-            child: Container(
-              width: Get.width * 0.42,
-              // width: double.infinity,
-              height: Get.height * 0.21,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(199, 158, 158, 158).withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 3), // changes position of shadow
-                  ),
-                ],
+        ],
+      );
+
+  _buildCountDataWithPiechart() => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Container(
+          width: double.infinity,
+          // height: Get.height * 0.21,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(199, 158, 158, 158).withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
               ),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+            ],
+          ),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  child: Container(
+                      width: Get.width * 0.28,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Counts',
+                            style: AppTextStyles
+                                .textStyles_PTSans_16_400_Secondary
+                                .copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          _buildCountData(widget.arrivalCount, 'Arrival'),
+                          _buildCountData(widget.departureCount, 'Departure'),
+                          _buildCountData(widget.stayoverCount, 'stayover'),
+                          _buildCountData(widget.bookedCount, 'Occupied'),
+                          _buildCountData(widget.blockedCount, 'Blocked')
+                        ],
+                      )),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.05,
+                ),
+                SizedBox(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.check_circle_outlined,
-                        color: AppColors.primary,
-                        size: 49,
-                      ),
                       Text(
-                        widget.checkedinCount,
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary),
+                        'Accuracy',
+                        style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                            .copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20),
                       ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        "Checked-In",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 16),
-                      )
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      PieChart(
+                        dataMap: {
+                          'Arrival':
+                              double.parse(widget.arrivalCount.toString()),
+                          'Departure':
+                              double.parse(widget.departureCount.toString()),
+                          'Stayover':
+                              double.parse(widget.stayoverCount.toString()),
+                          'Occupied':
+                              double.parse(widget.bookedCount.toString()),
+                          'Blocked':
+                              double.parse(widget.blockedCount.toString()),
+                        },
+                        chartValuesOptions: const ChartValuesOptions(
+                            showChartValues: false,
+                            showChartValuesInPercentage: false),
+                        animationDuration: const Duration(milliseconds: 500),
+                        legendOptions: const LegendOptions(
+                            // showLegends: false,
+
+                            legendTextStyle: TextStyle(
+                                fontSize: 10, fontWeight: FontWeight.w300),
+                            legendPosition: LegendPosition.right),
+                        chartType: ChartType.ring,
+                        chartRadius: 50,
+                        colorList: AppData.pieChartColors,
+                      ),
                     ],
                   ),
-                ),
-              ),
+                )
+              ],
             ),
           ),
-        ],
+        ),
+      );
+
+  _buildCountData(int data, String title) => SizedBox(
+        child: Padding(
+          padding: const EdgeInsets.all(3.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(title),
+              CircleAvatar(
+                backgroundColor: AppColors.primary,
+                radius: 10,
+                child: Center(
+                  child: Text(
+                    data.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
       );
 }

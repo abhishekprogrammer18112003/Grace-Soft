@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
+import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/core/constants/url_constant.dart';
 import 'package:gracesoft/features/reservations/widgets/filter_search_bottomsheet.dart';
 import 'package:gracesoft/features/reservations/widgets/reservation_details_card_widget.dart';
 import 'package:gracesoft/route/app_pages.dart';
 import 'package:gracesoft/route/custom_navigator.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import 'package:shimmer/shimmer.dart';
 
 class ReservationEntryPage extends StatefulWidget {
   const ReservationEntryPage({super.key});
@@ -16,6 +24,16 @@ class ReservationEntryPage extends StatefulWidget {
 class _ReservationEntryPageState extends State<ReservationEntryPage> {
   String? searchBySelectedItem = 'Reservation#';
   TextEditingController searchController = TextEditingController();
+  List<dynamic> reservationList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getReservationList();
+  }
+
+  bool _loadingReservationDetails = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,13 +54,27 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
                 fontSize: 20,
                 fontWeight: FontWeight.w500)),
       ),
-      body: ListView.builder(
-          itemCount: 6,
-          itemBuilder: (context, index) {
-            return const ReservationDetailsCardWidget();
-          }),
+      body: !_loadingReservationDetails
+          ? _buildReservationList()
+          : _buildShimmerPlaceholder(),
     );
   }
+
+  Widget _buildShimmerPlaceholder() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: _buildReservationList(),
+    );
+  }
+
+  _buildReservationList() => ListView.builder(
+      itemCount: reservationList.length,
+      itemBuilder: (context, index) {
+        return ReservationDetailsCardWidget(
+          reservationData: reservationList[index],
+        );
+      });
 
   _buildAdd() => GestureDetector(
         onTap: () {
@@ -78,4 +110,49 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
           ),
         ),
       );
+
+  //=============================RESERVATION API CALL=============================
+
+  void getReservationList() async {
+    _loadingReservationDetails = true;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String accessToken = AppData.accessToken;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map<String, dynamic> body = {
+      "PropertyId": AppData.propertyId,
+      "FilterType": "ConfirmNum",
+      "FilterValue": "",
+      "StatusFilter": "ALL",
+      "Offset": 0,
+      "Rows": 50,
+      "SortString": "ConfirmNum",
+      "Ascending": false,
+      "ReservationType": "Regular"
+    };
+
+    http.Response response = await http.post(Uri.parse(RESERVATION_LIST),
+        headers: headers, body: jsonEncode(body));
+
+    print('============Reservation List=========');
+    print(response.body);
+    var data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      reservationList.addAll(data);
+      setState(() {
+        _loadingReservationDetails = false;
+      });
+    } else {
+      Get.snackbar('Something went wrong !',
+          'Something went wrong . Please try again After sometime',
+          backgroundColor: Colors.orange);
+      setState(() {
+        _loadingReservationDetails = false;
+      });
+    }
+  }
 }

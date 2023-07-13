@@ -4,7 +4,8 @@ import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 
 class MemberDetailsCardWidget extends StatefulWidget {
-  const MemberDetailsCardWidget({super.key});
+  dynamic stayoverData;
+  MemberDetailsCardWidget({super.key, required this.stayoverData});
 
   @override
   State<MemberDetailsCardWidget> createState() =>
@@ -36,32 +37,31 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildResTag(),
-                  // SizedBox(width: Get.width * 0.04),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildNamePersonInfoRow(),
-                      const SizedBox(height: 5),
-                      _buildArrivalDeparture(),
-                      //icon for arrival and departure
-                      const SizedBox(height: 3),
-
-                      _buildDates(),
-                      //dates
-
-                      SizedBox(height: Get.height * 0.007),
-
-                      //Rooom no.
-                      _buildRoomNumber(),
-                    ],
-                  )
-                ],
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildResTag(),
+                    SizedBox(width: Get.width * 0.03),
+                    Container(
+                      width: Get.width * 0.7,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildNamePersonInfoRow(),
+                          const SizedBox(height: 5),
+                          _buildArrival(),
+                          const SizedBox(height: 3),
+                          _buildDates(),
+                          SizedBox(height: Get.height * 0.007),
+                          _buildRoomNumber(),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
@@ -72,7 +72,10 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
                 )),
               ),
               const SizedBox(height: 1),
-              _buildCardFooter(),
+              Container(
+                // color: Colors.blue,
+                child: _buildCardFooter(),
+              )
             ],
           ),
         ),
@@ -83,15 +86,15 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
   _buildResTag() => Container(
         height: Get.height * 0.1,
         width: Get.width * 0.1,
-        color: Colors.black87,
+        color: Colors.black54,
         child: RotatedBox(
           quarterTurns: -1,
           child: Center(
             child: RichText(
-              text: const TextSpan(
-                text: '4127',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+              text: TextSpan(
+                text: widget.stayoverData["ConfirmNumber"].toString(),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -100,59 +103,74 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
 
   _buildNamePersonInfoRow() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            "Mr. Manohar Mathew",
-            style: TextStyle(
-                fontWeight: FontWeight.w900,
-                color: AppColors.primary,
-                fontSize: 15),
+          SizedBox(
+            child: Text(
+              " ${widget.stayoverData["GuestName"].toString()}",
+              style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.primary,
+                  fontSize: 17),
+            ),
           ),
           SizedBox(
-            width: Get.width * 0.2,
-          ),
-          const Icon(Icons.person),
-          const SizedBox(width: 2),
-          const Text('1'),
+              child: Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Row(
+              children: [
+                const Icon(Icons.person),
+                const SizedBox(width: 2),
+                Text(widget.stayoverData["NoOfGuests"].toString())
+              ],
+            ),
+          ))
         ],
       );
-  _buildArrivalDeparture() => Row(
+  _buildArrival() => const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.share_arrival_time),
-          const SizedBox(width: 8),
-          const Text(
-            "Arrival",
-            style: TextStyle(
-                // color: Colors.white,
-                fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Icon(Icons.share_arrival_time),
+              SizedBox(width: 5),
+              Text(
+                "Arrival",
+                style: TextStyle(
+                    // color: Colors.white,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
-          SizedBox(
-            width: Get.width * 0.27,
-          ),
-          const Icon(Icons.departure_board),
-          const SizedBox(width: 8),
-          const Text(
-            "Departure",
-            style: TextStyle(
-                // color: Colors.white,
-                fontWeight: FontWeight.w600),
-          ),
+          Padding(
+            padding: EdgeInsets.only(right: 50.0),
+            child: Row(
+              children: [
+                Icon(Icons.departure_board),
+                SizedBox(width: 5),
+                Text(
+                  "Departure",
+                  style: TextStyle(
+                      // color: Colors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          )
         ],
       );
+
   _buildDates() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // const SizedBox(),
+          Text("  ${widget.stayoverData["ArrDate"]}"),
           const SizedBox(width: 10),
-          const Text("05/29/2023"),
-          SizedBox(
-            width: Get.width * 0.25,
+          Padding(
+            padding: const EdgeInsets.only(right: 50.0),
+            child: Text("${widget.stayoverData["DeptDate"]}"),
           ),
-          const SizedBox(width: 10),
-          const Text("05/31/2023"),
         ],
       );
 
@@ -160,7 +178,7 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
         children: [
           const Icon(Icons.door_back_door_outlined),
           Text(
-            "  Country Inn Suite Type 54",
+            " ${widget.stayoverData["RoomName"]}",
             style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                 .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
           ),
@@ -173,20 +191,31 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Referal : ",
-                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                    .copyWith(fontSize: 14, fontWeight: FontWeight.w800)),
-            Text('AppWhizRes'),
-            SizedBox(width: Get.width * 0.24),
+            widget.stayoverData["Referral"] != ""
+                ? Row(
+                    children: [
+                      Text("Referal : ",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w800)),
+                      Text(widget.stayoverData["Referral"]),
+                    ],
+                  )
+                : Container(
+                    child: Text('No Referal'),
+                  ),
+
+            // SizedBox(width: Get.width * 0.24),
             Container(
               height: 30,
-              width: 70,
+              width: 100,
               color: Colors.green,
-              child: const Center(
+              child: Center(
                   child: Text(
-                "Booked",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                widget.stayoverData["Status"],
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700),
               )),
             )
           ],

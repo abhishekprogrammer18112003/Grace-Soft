@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/core/constants/url_constant.dart';
+import 'package:gracesoft/features/dashboard/widgets/custom_switch_button.dart';
 import 'package:gracesoft/features/dashboard/widgets/main_dashboard_widget.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import 'package:shimmer/shimmer.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -11,111 +18,164 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String? selectedItem = 'Today';
+  String _selectedButton = 'Today';
+  int? arrivalCount;
+  // int? tomorrowArrivalCount;
+
+  int? departureCount;
+  // int? tomorrowDepartureCount;
+
+  int? bookedCount;
+  int? vacantCount;
+  int? blockedCount;
+  int? stayoverCount;
+
+  bool _countLoading = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDashboardCounts("Today");
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          // back
-          appBar: AppBar(
-            backgroundColor: AppColors.primary,
-
-            bottom: TabBar(
-              // indicatorWeight: 10,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicatorColor: Colors.white,
-              indicatorWeight: 4,
-
-              // indicator: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(50), // Creates border
-              //     color: appPrimarycolor),
-              tabs: [
-                Tab(
-                  child: Text("Today",
-                      style: AppTextStyles
-                          .textStyles_PlusJakartaSans_30_700_Primary
-                          .copyWith(
-                              fontSize: 16,
-                              color: Colors.yellow,
-                              fontWeight: FontWeight.w400)),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        automaticallyImplyLeading: false,
+        leading: const Icon(
+          Icons.hotel,
+          color: Colors.white,
+          size: 30,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 13.0),
+            child: Icon(Icons.refresh),
+          ),
+        ],
+        title: Text('Dashboard',
+            style: AppTextStyles.textStyles_Puritan_30_400_Secondary.copyWith(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500)),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CustomButton(
+                  label: 'Today',
+                  isSelected: _selectedButton == 'Today',
+                  onPressed: () {
+                    setState(() {
+                      _selectedButton = 'Today';
+                    });
+                    getDashboardCounts("Today");
+                  },
                 ),
-                Tab(
-                  child: Text("Tomorrow",
-                      style: AppTextStyles
-                          .textStyles_PlusJakartaSans_30_700_Primary
-                          .copyWith(
-                              fontSize: 16,
-                              color: Colors.yellow,
-                              fontWeight: FontWeight.w400)),
-                )
+                CustomButton(
+                  label: 'Tomorrow',
+                  isSelected: _selectedButton == 'Tomorrow',
+                  onPressed: () {
+                    setState(() {
+                      _selectedButton = 'Tomorrow';
+                    });
+                    getDashboardCounts("Tomorrow");
+                  },
+                ),
               ],
             ),
-
-            // leading: Icon(Icons.construction),
-            automaticallyImplyLeading: false,
-            leading: const Icon(
-              Icons.hotel,
-              color: Colors.white,
-              size: 30,
-            ),
-            title: Text('Dashboard',
-                style: AppTextStyles.textStyles_Puritan_30_400_Secondary
-                    .copyWith(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500)),
-          ),
-          body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              _buildTodayWidget(),
-              _buildTomorrowWidget(),
-            ],
-          )),
+            !_countLoading
+                ? DashboardWidget(
+                    arrivalCount: arrivalCount!,
+                    departureCount: departureCount!,
+                    bookedCount: bookedCount!,
+                    vacantCount: vacantCount!,
+                    blockedCount: blockedCount!,
+                    stayoverCount: stayoverCount!,
+                    day: _selectedButton,
+                  )
+                : _buildCountShimmerPlaceholder(),
+          ],
+        ),
+      ),
     );
   }
 
-  _buildTodayWidget() => DashboardWidget(
-      arrivalCount: "1",
-      blockedCount: "0",
-      checkedinCount: "0",
-      day: "Today",
-      departureCount: "0",
-      occupiedCount: "2",
-      stayoverCount: "1",
-      vacantCount: "52");
-  _buildTomorrowWidget() => DashboardWidget(
-      arrivalCount: "2",
-      blockedCount: "1",
-      checkedinCount: "0",
-      day: "Tomorrow",
-      departureCount: "5",
-      occupiedCount: "2",
-      stayoverCount: "1",
-      vacantCount: "51");
+  Widget _buildCountShimmerPlaceholder() {
+    return Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: DashboardWidget(
+            arrivalCount: 0,
+            blockedCount: 0,
+            day: '',
+            departureCount: 0,
+            bookedCount: 0,
+            stayoverCount: 0,
+            vacantCount: 0));
+  }
 
-  _buildDropDownMenu() => Container(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedItem,
-            onChanged: (newValue) {
-              setState(() {
-                selectedItem = newValue!;
-              });
-            },
-            items: AppData.daysItems.map((String option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Text(option),
-              );
-            }).toList(),
-          ),
-        ),
-      );
+  //=============================DASHBOARD COUNTS API CALL=============================
+
+  void getDashboardCounts(String day) async {
+    _countLoading = true;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String accessToken = AppData.accessToken;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map<String, dynamic> body = {
+      "Property": {"PropertyID": AppData.propertyId},
+      "ReportName": "CountDetails",
+      "Day": day.toString(),
+    };
+
+    http.Response response = await http.post(Uri.parse(DASHBOARD_COUNTS),
+        headers: headers, body: jsonEncode(body));
+
+    print('============dashboard count ${day}=========');
+    print(response.body);
+    var data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      arrivalCount = data['Arrival'];
+      departureCount = data['Depature'];
+      bookedCount = data['Booked'];
+      vacantCount = data['Vacant'];
+      blockedCount = data['Blocked'];
+      stayoverCount = data['StayOver'];
+
+      print(arrivalCount);
+      print(departureCount);
+      print(bookedCount);
+      print(vacantCount);
+      print(blockedCount);
+      print(stayoverCount);
+
+      setState(() {
+        _countLoading = false;
+      });
+    } else {
+      Get.snackbar('Something went wrong !',
+          'Something went wrong . Please try again After sometime',
+          backgroundColor: Colors.orange);
+      setState(() {
+        _countLoading = false;
+      });
+    }
+  }
 }
