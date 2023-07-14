@@ -5,10 +5,7 @@ import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
-import 'package:gracesoft/route/app_pages.dart';
-import 'dart:convert';
 
-import 'package:gracesoft/route/custom_navigator.dart';
 
 class ReservationDetailsCardWidget extends StatefulWidget {
   dynamic reservationData;

@@ -375,7 +375,7 @@ _room_summary(dynamic data) => Container(
                     ],
                   ),
                   const Divider(
-                    thickness: 1,
+                    thickness: 2,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
