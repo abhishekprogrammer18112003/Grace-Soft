@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
+import 'package:gracesoft/route/app_pages.dart';
 import 'dart:convert';
+
+import 'package:gracesoft/route/custom_navigator.dart';
 
 class ReservationDetailsCardWidget extends StatefulWidget {
   dynamic reservationData;
@@ -125,13 +129,22 @@ class _ReservationDetailsCardWidgetState
   _buildNamePersonInfoRow() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            child: Text(
-              " ${widget.reservationData["FullName"].toString()}",
-              style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primary,
-                  fontSize: 17),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PersonDetailsPage(data: widget.reservationData)));
+            },
+            child: SizedBox(
+              child: Text(
+                " ${widget.reservationData["FullName"].toString()}",
+                style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primary,
+                    fontSize: 17),
+              ),
             ),
           ),
           SizedBox(

@@ -18,4 +18,7 @@ const String RESERVATION_LIST =
 //=========================Calender Api================================
 
 const String INITIAL_DATA =
+    "$BASE_URL/PMSUI-test3/mig/webapi/api/Calendar/InitialData";
+
+const String CALENDAR_DATA =
     "$BASE_URL/PMSUI-test3/mig/webapi/api/Calendar/GetCalendarData";
