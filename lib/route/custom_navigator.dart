@@ -104,11 +104,7 @@ class CustomNavigator {
           builder: (context) => const ReservationEntryPage(),
           settings: settings,
         );
-      case AppPages.personDetailsPage:
-        return MaterialPageRoute(
-          builder: (context) => const PersonDetailsPage(),
-          settings: settings,
-        );
+      
       case AppPages.addReservation:
         return MaterialPageRoute(
           builder: (context) => const AddReservationPage(),

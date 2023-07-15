@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
+import 'package:gracesoft/core/constants/app_data.dart';
+import 'package:gracesoft/core/constants/url_constant.dart';
 import 'package:table_sticky_headers/table_sticky_headers.dart';
+import 'package:http/http.dart' as http;
 
 class CalenderPage extends StatefulWidget {
   const CalenderPage({super.key});
@@ -17,8 +22,44 @@ class _CalenderPageState extends State<CalenderPage> {
     "Country Inn Suite Type 51"
   ];
   var weekday = ['Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+  dynamic calendarInitialData;
 
   var date = DateTime.now();
+  //+++++++++++++++++++++API CALL+++++++++++++++++++++++++++
+
+  void getCalendarInitialData() async {
+    String accessToken = AppData.accessToken;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    dynamic body = {
+      "PropertyId": AppData.propertyId,
+    };
+
+    http.Response response = await http.post(Uri.parse(INITIAL_DATA),
+        headers: headers, body: jsonEncode(body));
+
+    print('============Calendar Initial Data=========');
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      calendarInitialData = jsonDecode(response.body.toString());
+      print(calendarInitialData);
+    } else {
+      print("ERROR");
+    }
+    ;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getCalendarInitialData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,9 +92,7 @@ class _CalenderPageState extends State<CalenderPage> {
                 GestureDetector(
                   onTap: () {
                     var currdate = DateTime.now();
-                    setState(() {
-                      date = currdate;
-                    });
+                    getCalendarInitialData();
                   },
                   child: Container(
                     child: Text(
@@ -103,7 +142,7 @@ class _CalenderPageState extends State<CalenderPage> {
                 contentCellHeight: 50,
                 stickyLegendWidth: 100,
                 stickyLegendHeight: 40),
-            columnsLength: 30,
+            columnsLength: roomName.length,
             rowsLength: roomName.length,
             columnsTitleBuilder: (columnIndex) {
               return Text(
