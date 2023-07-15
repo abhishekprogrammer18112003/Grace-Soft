@@ -48,6 +48,7 @@ class _StayoverPageState extends State<StayoverPage> {
                   itemBuilder: (context, index) {
                     return MemberDetailsCardWidget(
                       stayoverData: stayOverList[index],
+                      ArrivalData: null,
                     );
                   }),
             )
@@ -59,7 +60,10 @@ class _StayoverPageState extends State<StayoverPage> {
     return Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
-        child: MemberDetailsCardWidget(stayoverData: {}));
+        child: MemberDetailsCardWidget(
+          stayoverData: {},
+          ArrivalData: null,
+        ));
   }
 
   //=========================StayOver Api============================
