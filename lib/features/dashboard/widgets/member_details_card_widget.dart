@@ -5,7 +5,7 @@ import 'package:gracesoft/core/constants/app_text_styles.dart';
 
 class MemberDetailsCardWidget extends StatefulWidget {
   dynamic stayoverData;
-  MemberDetailsCardWidget({super.key, required this.stayoverData});
+  MemberDetailsCardWidget({super.key, required this.stayoverData, required ArrivalData});
 
   @override
   State<MemberDetailsCardWidget> createState() =>
