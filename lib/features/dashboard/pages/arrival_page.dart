@@ -52,7 +52,9 @@ class _ArrivalPageState extends State<ArrivalPage> {
                     );
                   }),
             )
-          : _buildArrivalShimmerPlaceholder(),
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 

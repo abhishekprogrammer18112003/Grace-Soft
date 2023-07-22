@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gracesoft/core/constants/app_text_styles.dart';
 
 // ignore: must_be_immutable
 class PersonDetailsPage extends StatefulWidget {
@@ -80,14 +81,22 @@ _booking_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("RoomTotal"),
+                      Text("Room Total",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['RoomTotal'].toString())
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("OtherCharges"),
+                      Text("Other Charges",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['OtherCharges'].toString())
                     ],
                   ),
@@ -97,7 +106,11 @@ _booking_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("PreTaxTotal"),
+                      Text("Pre Tax Total",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['PreTaxTotal'].toString())
                     ],
                   ),
@@ -107,32 +120,49 @@ _booking_summary(dynamic data) => Container(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [const Text("Tax"), Text(data['Tax'].toString())],
+                    children: [
+                      Text("Tax",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
+                      Text(data['Tax'].toString())
+                    ],
                   ),
                   const Divider(thickness: 1),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("PostTaxTotal"),
+                      Text("Post Tax Total",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['PostTaxTotal'].toString())
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "AmountPaid",
-                      ),
+                      Text("Amount Paid",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['AmountPaid'].toString())
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("AmountDue",
-                          style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
-                      Text(data['AmountDue'].toString())
+                      Text("Amount Due",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
+                      Text(
+                        data['AmountDue'].toString(),
+                      )
                     ],
                   ),
                 ],
@@ -190,7 +220,11 @@ _guest_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Name"),
+                      Text("Name",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['FullName'].toString()),
                     ],
                   ),
@@ -203,9 +237,14 @@ _guest_summary(dynamic data) => Container(
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("City"),
+                          Text("City :",
+                              style: AppTextStyles
+                                  .textStyles_PTSans_16_400_Secondary
+                                  .copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700)),
                           const SizedBox(
-                            width: 20,
+                            width: 10,
                           ),
                           Text(data['City'].toString()),
                         ],
@@ -213,9 +252,14 @@ _guest_summary(dynamic data) => Container(
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("State"),
+                          Text("State :",
+                              style: AppTextStyles
+                                  .textStyles_PTSans_16_400_Secondary
+                                  .copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700)),
                           const SizedBox(
-                            width: 20,
+                            width: 10,
                           ),
                           Text(data['State'].toString()),
                         ],
@@ -225,14 +269,22 @@ _guest_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Zip"),
+                      Text("Zip",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['Zip'].toString()),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Country"),
+                      Text("Country",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['Country'].toString()),
                     ],
                   ),
@@ -242,7 +294,11 @@ _guest_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("HomePhone"),
+                      Text("HomePhone",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['HomePhone'].toString()),
                     ],
                   ),
@@ -301,7 +357,11 @@ _payment_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Payment Type"),
+                      Text("Payment Type",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['CCType'].toString()),
                     ],
                   ),
@@ -309,8 +369,11 @@ _payment_summary(dynamic data) => Container(
                     onPressed: () {},
                     child: Container(
                       width: double.infinity,
-                      child: const Text(
+                      child: Text(
                         "PAY AMOUNT DUE",
+                        style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                            .copyWith(
+                                fontSize: 14, fontWeight: FontWeight.w700),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -370,7 +433,11 @@ _room_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Room Name"),
+                      Text("Room Name",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['RoomNames'].toString()),
                     ],
                   ),
@@ -380,14 +447,22 @@ _room_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Arrival Date"),
+                      Text("Arrival Date",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['ArrDate'].toString()),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Departure Date"),
+                      Text("Departure Date",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['DeptDate'].toString()),
                     ],
                   ),
@@ -397,7 +472,11 @@ _room_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Stay Length"),
+                      Text("Stay Length",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Text(data['StayLength'].toString()),
                     ],
                   ),
@@ -407,7 +486,11 @@ _room_summary(dynamic data) => Container(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("No of Guest"),
+                      Text("No of Guest",
+                          style: AppTextStyles
+                              .textStyles_PTSans_16_400_Secondary
+                              .copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.w700)),
                       Container(
                           child: Row(
                         children: [

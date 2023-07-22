@@ -52,7 +52,9 @@ class _DeparturePageState extends State<DeparturePage> {
                     );
                   }),
             )
-          : _buildDepartureShimmerPlaceholder(),
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 

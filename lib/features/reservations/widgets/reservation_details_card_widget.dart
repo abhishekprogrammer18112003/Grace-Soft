@@ -6,7 +6,6 @@ import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
 
-
 class ReservationDetailsCardWidget extends StatefulWidget {
   dynamic reservationData;
   ReservationDetailsCardWidget({super.key, required this.reservationData});
@@ -37,68 +36,77 @@ class _ReservationDetailsCardWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: Get.width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15.0),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(199, 158, 158, 158).withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildResTag(),
-                    SizedBox(width: Get.width * 0.03),
-                    Container(
-                      width: Get.width * 0.7,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildNamePersonInfoRow(),
-                          const SizedBox(height: 5),
-                          _buildArrival(),
-                          const SizedBox(height: 3),
-                          _buildDates(),
-                          SizedBox(height: Get.height * 0.007),
-                          _buildRoomNumber(),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    PersonDetailsPage(data: widget.reservationData)));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          width: Get.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(199, 158, 158, 158).withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: SizedBox(
-                    child: Divider(
-                  thickness: 1,
-                  color: Colors.grey,
-                )),
-              ),
-              const SizedBox(height: 1),
-              Container(
-                // color: Colors.blue,
-                child: _buildCardFooter(),
-              )
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildResTag(),
+                      SizedBox(width: Get.width * 0.03),
+                      Container(
+                        width: Get.width * 0.7,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildNamePersonInfoRow(),
+                            const SizedBox(height: 5),
+                            _buildArrival(),
+                            const SizedBox(height: 3),
+                            _buildDates(),
+                            SizedBox(height: Get.height * 0.007),
+                            _buildRoomNumber(),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: SizedBox(
+                      child: Divider(
+                    thickness: 1,
+                    color: Colors.grey,
+                  )),
+                ),
+                const SizedBox(height: 1),
+                Container(
+                  // color: Colors.blue,
+                  child: _buildCardFooter(),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -127,13 +135,6 @@ class _ReservationDetailsCardWidgetState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          PersonDetailsPage(data: widget.reservationData)));
-            },
             child: SizedBox(
               child: Text(
                 " ${widget.reservationData["FullName"].toString()}",

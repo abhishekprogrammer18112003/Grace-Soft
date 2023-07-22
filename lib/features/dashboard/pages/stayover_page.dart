@@ -52,7 +52,9 @@ class _StayoverPageState extends State<StayoverPage> {
                     );
                   }),
             )
-          : _buildSatyoverShimmerPlaceholder(),
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 

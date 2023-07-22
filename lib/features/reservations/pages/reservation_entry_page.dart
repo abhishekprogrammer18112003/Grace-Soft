@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
@@ -28,7 +27,6 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
 
   @override
   void initState() {
-   
     super.initState();
     getReservationList();
   }
@@ -56,7 +54,9 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
       ),
       body: !_loadingReservationDetails
           ? _buildReservationList()
-          : _buildShimmerPlaceholder(),
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 

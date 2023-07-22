@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 
+// ignore: must_be_immutable
 class MemberDetailsCardWidget extends StatefulWidget {
   dynamic stayoverData;
   MemberDetailsCardWidget({super.key, required this.stayoverData, required ArrivalData});
