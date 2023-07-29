@@ -24,7 +24,7 @@ class _DashBoardCardWidgetState extends State<DashBoardCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Get.width * 0.28,
+      width: Get.width * 0.42,
       height: Get.height * 0.21,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -58,7 +58,7 @@ class _DashBoardCardWidgetState extends State<DashBoardCardWidget> {
 
   _buildIcon() => SizedBox(
       height: Get.height * 0.08,
-      width: Get.width * 0.15,
+      width: Get.width * 0.25,
       child: Image.asset(widget.image));
 
   _buildCount() => SizedBox(
@@ -75,7 +75,7 @@ class _DashBoardCardWidgetState extends State<DashBoardCardWidget> {
           widget.name,
           textAlign: TextAlign.center,
           style: AppTextStyles.textStyles_Puritan_30_400_Secondary.copyWith(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
         ),
