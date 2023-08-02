@@ -29,6 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
   int? vacantCount;
   int? blockedCount;
   int? stayoverCount;
+  int? checkinCount = 0;
 
   bool _countLoading = false;
 
@@ -36,7 +37,12 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getDashboardCounts("Today");
+    _initializeCount();
+  }
+
+  _initializeCount() async {
+    await getDashboardCounts("Today");
+    await getCheckedInCounts("Today");
   }
 
   @override
@@ -50,9 +56,9 @@ class _DashboardPageState extends State<DashboardPage> {
           color: Colors.white,
           size: 30,
         ),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 13.0),
+            padding: EdgeInsets.only(right: 13.0),
             child: Icon(Icons.refresh),
           ),
         ],
@@ -82,6 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       _selectedButton = 'Today';
                     });
                     getDashboardCounts("Today");
+                    getCheckedInCounts("Today");
                   },
                 ),
                 CustomButton(
@@ -92,6 +99,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       _selectedButton = 'Tomorrow';
                     });
                     getDashboardCounts("Tomorrow");
+                    getCheckedInCounts("Tomorrow");
                   },
                 ),
               ],
@@ -105,6 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     blockedCount: blockedCount!,
                     stayoverCount: stayoverCount!,
                     day: _selectedButton,
+                    checkInCount: checkinCount!,
                   )
                 : _buildCountShimmerPlaceholder(),
           ],
@@ -118,18 +127,59 @@ class _DashboardPageState extends State<DashboardPage> {
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
         child: DashboardWidget(
-            arrivalCount: 0,
-            blockedCount: 0,
-            day: '',
-            departureCount: 0,
-            bookedCount: 0,
-            stayoverCount: 0,
-            vacantCount: 0));
+          checkInCount: 0,
+          arrivalCount: 0,
+          blockedCount: 0,
+          day: '',
+          departureCount: 0,
+          bookedCount: 0,
+          stayoverCount: 0,
+          vacantCount: 0,
+        ));
   }
 
-  //=============================DASHBOARD COUNTS API CALL=============================
+  //=============================Checkedin COUNTS API CALL=============================
+  getCheckedInCounts(String day) async {
+    _countLoading = true;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String accessToken = AppData.accessToken;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  void getDashboardCounts(String day) async {
+    Map<String, dynamic> body = {
+      "Property": {"PropertyID": AppData.propertyId},
+      //checkdin
+      "ReportName": "Stayover",
+      "Day": day.toString(),
+    };
+    //checkin
+    http.Response response = await http.post(Uri.parse(STAYOVER_DATA),
+        headers: headers, body: jsonEncode(body));
+
+    print('============CheckedIn count ${day}=========');
+    print(response.body);
+    var data = jsonDecode(response.body);
+    // checkinCount = 0;
+
+    if (response.statusCode == 200) {
+      print(data);
+
+      setState(() {
+        _countLoading = false;
+      });
+    } else {
+      Get.snackbar('Something went wrong !',
+          'Something went wrong . Please try again After sometime',
+          backgroundColor: Colors.orange);
+      setState(() {
+        _countLoading = false;
+      });
+    }
+  }
+
+  getDashboardCounts(String day) async {
     _countLoading = true;
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     String accessToken = AppData.accessToken;
@@ -164,7 +214,6 @@ class _DashboardPageState extends State<DashboardPage> {
       print(bookedCount);
       print(vacantCount);
       print(blockedCount);
-      print(stayoverCount);
 
       setState(() {
         _countLoading = false;

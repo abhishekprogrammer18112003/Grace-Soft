@@ -10,6 +10,9 @@ const String DASHBOARD_COUNTS =
 const String STAYOVER_DATA =
     "$BASE_URL/PMSUI-test3/mig/webapi/api/Lists/DashBoardDetails";
 
+const String CHECKEDIN_DATA=
+    "$BASE_URL/PMSUI-test3/mig/webapi/api/Lists/DashBoardDetails";
+
 //=======================RESERVATION API'S======================================
 
 const String RESERVATION_LIST =
