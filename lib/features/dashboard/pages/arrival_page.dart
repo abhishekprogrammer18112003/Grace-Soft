@@ -43,15 +43,18 @@ class _ArrivalPageState extends State<ArrivalPage> {
           ? Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-              child: ListView.builder(
-                  itemCount: ArrivalList.length,
-                  itemBuilder: (context, index) {
-                    return MemberDetailsCardWidget(
-                      stayoverData: ArrivalList[index],
-                      ArrivalData: null,
-                    );
-                  }),
-            )
+              child: ArrivalList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: ArrivalList.length,
+                      itemBuilder: (context, index) {
+                        return MemberDetailsCardWidget(
+                          stayoverData: ArrivalList[index],
+                          ArrivalData: null,
+                        );
+                      })
+                  : Center(
+                      child: Text('No Arrival\'s ${widget.arguements['day']}'),
+                    ))
           : const Center(
               child: CircularProgressIndicator(),
             ),

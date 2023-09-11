@@ -1,14 +1,19 @@
 // ignore_for_file: camel_case_types, unused_import
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
+import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_icons.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/core/constants/url_constant.dart';
 import 'package:gracesoft/route/app_pages.dart';
 import 'package:gracesoft/route/custom_navigator.dart';
+import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   bool _showPassword = false;
-  bool _isloading = false;
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -260,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColors.primary),
-          child: _isloading
+          child: _isLoading
               ? const Center(
                   child: CircularProgressIndicator(
                   color: Colors.white,
@@ -283,14 +288,95 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   void _login() {
-    // setState(() {
-    //   _isloading = true;
-    // });
-    // Timer(const Duration(seconds: 3), () {
-    //   Get.off(const BottomNavigationBarWidget());
-    // });
     if (_formKey.currentState!.validate()) {
-      CustomNavigator.pushReplace(context, AppPages.navigationBar);
+      validateLogin();
+    }
+  }
+
+  //Api Integration
+  // void validateLogin() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   // SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   print(propertyShortNameController.text);
+  //   print(nameController.text);
+  //   print(passwordController.text);
+
+  //   Map<String, dynamic> bodytosend = {
+  //     "ShortName": propertyShortNameController.text.toString(),
+  //     "UserName": nameController.text.toString(),
+  //     "Password": passwordController.text.toString(),
+  //   };
+
+  //   http.Response response =
+  //       await http.post(Uri.parse(LOGIN_API), body: (bodytosend));
+
+  //   print(response.body);
+  //   var data = jsonDecode(response.body);
+
+  //   if (response.statusCode == 200) {
+  //     print("response");
+  //     AppData.accessToken = data['accessToken'];
+  //     AppData.propertyId = data['propertyId'];
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     CustomNavigator.pushReplace(context, AppPages.navigationBar);
+  //   } else {
+  //     print("error");
+  //     Get.snackbar('Something went wrong !',
+  //         'Something went wrong . Please try again After sometime',
+  //         backgroundColor: Colors.orange);
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  Future<void> validateLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final dio = Dio();
+
+    final requestBody = {
+      "ShortName": propertyShortNameController.text.toString(),
+      "UserName": nameController.text.toString(),
+      "Password": passwordController.text.toString(),
+    };
+
+    try {
+      final response = await dio.post(LOGIN_API, data: requestBody);
+      print(response.data);
+
+      if (response.statusCode == 200) {
+        print("response");
+        AppData.accessToken = response.data['accessToken'];
+        AppData.propertyId = int.parse(response.data['propertyId']);
+        print(AppData.accessToken);
+        print(AppData.propertyId);
+        // setState(() {
+        //   _isLoading = false;
+        // });
+        CustomNavigator.pushReplace(context, AppPages.navigationBar);
+      } else {
+        print("error");
+        Get.snackbar('Something went wrong !',
+            'Something went wrong. Please try again after some time',
+            backgroundColor: Colors.orange);
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (error) {
+      print("error : ${error}");
+      Get.snackbar('Network Error', 'An error occurred. Please try again.',
+          backgroundColor: Colors.red);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }

@@ -49,7 +49,9 @@ class _ReservationDetailsCardWidgetState
         child: Container(
           width: Get.width,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: widget.reservationData["Status"] != ''
+                ? Colors.white
+                : const Color.fromARGB(255, 204, 204, 204),
             borderRadius: BorderRadius.circular(15.0),
             boxShadow: [
               BoxShadow(
@@ -66,31 +68,29 @@ class _ReservationDetailsCardWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildResTag(),
-                      SizedBox(width: Get.width * 0.03),
-                      Container(
-                        width: Get.width * 0.7,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildNamePersonInfoRow(),
-                            const SizedBox(height: 5),
-                            _buildArrival(),
-                            const SizedBox(height: 3),
-                            _buildDates(),
-                            SizedBox(height: Get.height * 0.007),
-                            _buildRoomNumber(),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildResTag(),
+                    SizedBox(width: Get.width * 0.02),
+                    SizedBox(
+                      width: Get.width * 0.7,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildNamePersonInfoRow(),
+                          const SizedBox(height: 5),
+                          _buildArrival(),
+                          const SizedBox(height: 3),
+                          _buildDates(),
+                          SizedBox(height: Get.height * 0.007),
+                          _buildRoomNumber(),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -209,10 +209,16 @@ class _ReservationDetailsCardWidgetState
   _buildRoomNumber() => Row(
         children: [
           const Icon(Icons.door_back_door_outlined),
-          Text(
-            " ${widget.reservationData["RoomNames"]}",
-            style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+          const SizedBox(
+            width: 5,
+          ),
+          SizedBox(
+            width: Get.width * 0.6,
+            child: Text(
+              "${widget.reservationData["RoomNames"]}",
+              style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                  .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       );
@@ -249,21 +255,23 @@ class _ReservationDetailsCardWidgetState
             ),
 
             // SizedBox(width: Get.width * 0.24),
-            Container(
-              height: 30,
-              width: 100,
-              color: widget.reservationData["Status"] == "CANCELLED"
-                  ? Colors.red
-                  : widget.reservationData["Status"] != "Confirmed"
-                      ? Colors.blue
-                      : Colors.green,
-              child: Center(
-                  child: Text(
-                widget.reservationData["Status"],
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
-              )),
-            )
+            widget.reservationData["Status"] != ''
+                ? Container(
+                    height: 30,
+                    width: 100,
+                    color: widget.reservationData["Status"] == "CANCELLED"
+                        ? Colors.red
+                        : widget.reservationData["Status"] != "Confirmed"
+                            ? Colors.blue
+                            : Colors.green,
+                    child: Center(
+                        child: Text(
+                      widget.reservationData["Status"],
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w700),
+                    )),
+                  )
+                : Container()
           ],
         ),
       );

@@ -62,12 +62,13 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
           physics: const NeverScrollableScrollPhysics(),
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: AppColors.primary,
+          // backgroundColor: AppColors.primary,
           selectedItemColor: Colors.yellow,
-          unselectedItemColor: Colors.white,
+          unselectedItemColor: AppColors.white,
           unselectedLabelStyle: TextStyle(color: Colors.grey),
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
+          elevation: 10,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               backgroundColor: AppColors.primary,
@@ -77,14 +78,17 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
               label: 'Dashboard',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.primary,
               icon: Icon(Icons.real_estate_agent_outlined),
               label: 'Reservations',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.primary,
               icon: Icon(Icons.calendar_month),
               label: 'Calender',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.primary,
               icon: Icon(Icons.house),
               label: 'Housekeeping',
             ),

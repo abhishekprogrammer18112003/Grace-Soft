@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,15 +43,18 @@ class _CheckedinPageState extends State<CheckedinPage> {
           ? Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-              child: ListView.builder(
-                  itemCount: CheckedInList.length,
-                  itemBuilder: (context, index) {
-                    return MemberDetailsCardWidget(
-                      stayoverData: CheckedInList[index],
-                      ArrivalData: null,
-                    );
-                  }),
-            )
+              child: CheckedInList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: CheckedInList.length,
+                      itemBuilder: (context, index) {
+                        return MemberDetailsCardWidget(
+                          stayoverData: CheckedInList[index],
+                          ArrivalData: null,
+                        );
+                      })
+                  : Center(
+                      child: Text('No Checked-In ${widget.arguements['day']}'),
+                    ))
           : const Center(
               child: CircularProgressIndicator(),
             ),
@@ -82,7 +87,7 @@ class _CheckedinPageState extends State<CheckedinPage> {
       "Day": day.toString(),
     };
 
-    http.Response response = await http.post(Uri.parse(CHECKEDIN_DATA),
+    http.Response response = await http.post(Uri.parse(STAYOVER_DATA),
         headers: headers, body: jsonEncode(body));
 
     print('============dashboard count ${day}=========');

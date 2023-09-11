@@ -43,15 +43,18 @@ class _StayoverPageState extends State<StayoverPage> {
           ? Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-              child: ListView.builder(
-                  itemCount: stayOverList.length,
-                  itemBuilder: (context, index) {
-                    return MemberDetailsCardWidget(
-                      stayoverData: stayOverList[index],
-                      ArrivalData: null,
-                    );
-                  }),
-            )
+              child: stayOverList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: stayOverList.length,
+                      itemBuilder: (context, index) {
+                        return MemberDetailsCardWidget(
+                          stayoverData: stayOverList[index],
+                          ArrivalData: null,
+                        );
+                      })
+                  : Center(
+                      child: Text('No Stayovers ${widget.arguements['day']}'),
+                    ))
           : Center(
               child: CircularProgressIndicator(),
             ),

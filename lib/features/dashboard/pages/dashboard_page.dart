@@ -29,7 +29,6 @@ class _DashboardPageState extends State<DashboardPage> {
   int? vacantCount;
   int? blockedCount;
   int? stayoverCount;
-  int? checkinCount = 0;
 
   bool _countLoading = false;
 
@@ -51,17 +50,17 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         automaticallyImplyLeading: false,
-        leading: const Icon(
-          Icons.hotel,
-          color: Colors.white,
-          size: 30,
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 13.0),
-            child: Icon(Icons.refresh),
-          ),
-        ],
+        // leading: const Icon(
+        //   Icons.hotel,
+        //   color: Colors.white,
+        //   size: 30,
+        // ),
+        // actions: const [
+        //   Padding(
+        //     padding: EdgeInsets.only(right: 13.0),
+        //     child: Icon(Icons.refresh),
+        //   ),
+        // ],
         title: Text('Dashboard',
             style: AppTextStyles.textStyles_Puritan_30_400_Secondary.copyWith(
                 color: Colors.white,
@@ -113,7 +112,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     blockedCount: blockedCount!,
                     stayoverCount: stayoverCount!,
                     day: _selectedButton,
-                    checkInCount: checkinCount!,
+                    checkInCount: checkedInList.length,
+                    checkedInData: checkedInList,
                   )
                 : _buildCountShimmerPlaceholder(),
           ],
@@ -135,13 +135,14 @@ class _DashboardPageState extends State<DashboardPage> {
           bookedCount: 0,
           stayoverCount: 0,
           vacantCount: 0,
+          checkedInData: [],
         ));
   }
 
   //=============================Checkedin COUNTS API CALL=============================
+  List<dynamic> checkedInList = [];
   getCheckedInCounts(String day) async {
     _countLoading = true;
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
     String accessToken = AppData.accessToken;
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -150,12 +151,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
     Map<String, dynamic> body = {
       "Property": {"PropertyID": AppData.propertyId},
-      //checkdin
-      "ReportName": "Stayover",
+      "ReportName": "Checked In",
       "Day": day.toString(),
     };
     //checkin
-    http.Response response = await http.post(Uri.parse(STAYOVER_DATA),
+    http.Response response = await http.post(Uri.parse(CHECKEDIN_DATA),
         headers: headers, body: jsonEncode(body));
 
     print('============CheckedIn count ${day}=========');
@@ -164,6 +164,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // checkinCount = 0;
 
     if (response.statusCode == 200) {
+      checkedInList.addAll(data);
       print(data);
 
       setState(() {

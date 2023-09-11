@@ -318,40 +318,47 @@ class _CalenderPageState extends State<CalenderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Calendar"),
-        backgroundColor: AppColors.primary,
-        // centerTitle: true,
-        leading: const Icon(Icons.calendar_month),
-        actions: [
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RoomsTypePage(
-                              calendarInitialData: _calendarInitialData,
-                              dropdownList: _dropdownList,
-                            )));
-              },
-              child: const Padding(
-                padding: EdgeInsets.only(right: 10.0),
-                child: Icon(Icons.meeting_room),
-              ))
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 10),
-            // _buildHeader(),
-            _buildFromToDate(),
-            const SizedBox(height: 10),
-            _buildCalenderDataList()
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Calendar"),
+          backgroundColor: AppColors.primary,
+          // centerTitle: true,
+          // leading: const Icon(Icons.calendar_month),
+          actions: [
+            !_roomsData.isEmpty
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RoomsTypePage(
+                                    calendarInitialData: _calendarInitialData,
+                                    dropdownList: _dropdownList,
+                                  )));
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(right: 15.0),
+                      child: Icon(Icons.meeting_room),
+                    ))
+                : Container(),
           ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 15),
+              // _buildHeader(),
+              _buildFromToDate(),
+              const SizedBox(height: 10),
+              _buildCalenderDataList()
+            ],
+          ),
         ),
       ),
     );
@@ -366,20 +373,20 @@ class _CalenderPageState extends State<CalenderPage> {
             children: [
               SizedBox(
                 width: Get.width * 0.45,
-                height: 50,
                 child: TextFormField(
                   controller: fromDateController,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
-                    suffixIcon: Icon(
+                    suffixIcon: const Icon(
                       Icons.calendar_today,
                     ),
-                    hintText: fromDateController.text.toString(),
+                    labelText: 'from',
+                    labelStyle: const TextStyle(color: AppColors.primary),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(10)),
                     focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(color: AppColors.primary),
-                        borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   readOnly: true,
                   onTap: () async {
@@ -410,18 +417,18 @@ class _CalenderPageState extends State<CalenderPage> {
             children: [
               SizedBox(
                 width: Get.width * 0.45,
-                height: 50,
                 child: TextFormField(
                   controller: toDateController,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
                     suffixIcon: Icon(Icons.calendar_today),
-                    hintText: toDateController.text.toString(),
+                    labelText: 'to',
+                    labelStyle: TextStyle(color: AppColors.primary),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(10)),
                     focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(color: AppColors.primary),
-                        borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   readOnly: true,
                   onTap: () async {

@@ -6,7 +6,8 @@ import 'package:gracesoft/core/constants/app_text_styles.dart';
 // ignore: must_be_immutable
 class MemberDetailsCardWidget extends StatefulWidget {
   dynamic stayoverData;
-  MemberDetailsCardWidget({super.key, required this.stayoverData, required ArrivalData});
+  MemberDetailsCardWidget(
+      {super.key, required this.stayoverData, required ArrivalData});
 
   @override
   State<MemberDetailsCardWidget> createState() =>
@@ -178,10 +179,15 @@ class _MemberDetailsCardWidgetState extends State<MemberDetailsCardWidget> {
   _buildRoomNumber() => Row(
         children: [
           const Icon(Icons.door_back_door_outlined),
-          Text(
-            " ${widget.stayoverData["RoomName"]}",
-            style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+          SizedBox(width: 5),
+          Container(
+            width: Get.width * 0.6,
+            // color: AppColors.TOAST_ALERT,
+            child: Text(
+              "${widget.stayoverData["RoomName"]}",
+              style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                  .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       );

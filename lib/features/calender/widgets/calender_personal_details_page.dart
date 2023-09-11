@@ -6,27 +6,30 @@ import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 
 // ignore: must_be_immutable
-class PersonDetailsPage extends StatefulWidget {
-  PersonDetailsPage({super.key, required this.data});
+class CalenderPersonDetailsPage extends StatefulWidget {
+  CalenderPersonDetailsPage(
+      {super.key, required this.data, required this.roomsData});
   dynamic data;
+  dynamic roomsData;
   @override
-  State<PersonDetailsPage> createState() => _PersonDetailsPageState();
+  State<CalenderPersonDetailsPage> createState() =>
+      _CalenderPersonDetailsPageState();
 }
 
-class _PersonDetailsPageState extends State<PersonDetailsPage> {
+class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
   String? ArrDate;
   String? DeptDate;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    String arrival = widget.data["ArrDate"];
+    print(widget.roomsData['RoomName']);
+    String arrival = widget.data["ResArrDate"];
     List<String> arrDate = arrival.split('T');
 
     ArrDate = arrDate[0];
 
-    String departure = widget.data["DeptDate"];
+    String departure = widget.data["ResDeptDate"];
     List<String> deptDate = departure.split('T');
     DeptDate = deptDate[0];
   }
@@ -59,7 +62,7 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
             _guest_summary(widget.data),
             _room_summary(widget.data),
             _booking_summary(widget.data),
-            _payment_summary(widget.data),
+            // _payment_summary(widget.data),
           ],
         ),
       ),
@@ -110,44 +113,48 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    data['RoomTotal'] != ''
+                    data['RoomRate'] != ''
                         ? buildWidget(
-                            data: data['RoomTotal'].toString(),
-                            title: 'Room Total (in \$) : ')
+                            data: data['RoomRate'].toString(),
+                            title: 'Room Rate (in \$) : ')
                         : Container(),
-                    SizedBox(height: 5),
-                    data['OtherCharges'] != ''
-                        ? buildWidget(
-                            data: data['OtherCharges'].toString(),
-                            title: 'Other Charges (in \$) :')
-                        : Container(),
+                    // SizedBox(height: 5),
+                    // data['OtherCharges'] != ''
+                    //     ? buildWidget(
+                    //         data: data['OtherCharges'].toString(),
+                    //         title: 'Other Charges (in \$) :')
+                    //     : Container(),
                     const Divider(
                       thickness: 1,
                     ),
-                    data['PreTaxTotal'] != ''
-                        ? buildWidget(
-                            data: data['PreTaxTotal'].toString(),
-                            title: 'Pre Tax Total (in \$)')
-                        : Container(),
-                    const Divider(
-                      thickness: 1,
-                    ),
-                    data['Tax'] != ''
-                        ? buildWidget(
-                            data: data['Tax'].toString(),
-                            title: 'Tax (in \$) :')
-                        : Container(),
-                    const Divider(thickness: 1),
+                    // data['PreTaxTotal'] != ''
+                    //     ? buildWidget(
+                    //         data: data['PreTaxTotal'].toString(),
+                    //         title: 'Pre Tax Total (in \$)')
+                    //     : Container(),
+                    // const Divider(
+                    //   thickness: 1,
+                    // ),
+                    // data['Tax'] != ''
+                    //     ? buildWidget(
+                    //         data: data['Tax'].toString(),
+                    //         title: 'Tax (in \$) :')
+                    //     : Container(),
+                    // const Divider(thickness: 1),
                     data['PostTaxTotal'] != ''
                         ? buildWidget(
                             data: data['PostTaxTotal'].toString(),
                             title: 'Post Tax Total (in \$) :')
                         : Container(),
-                    SizedBox(height: 5),
+                    const Divider(
+                      thickness: 1,
+                    ),
                     buildWidget(
                         data: data['AmountPaid'].toString(),
                         title: 'Amount Paid (in \$) :'),
-                    SizedBox(height: 5),
+                    const Divider(
+                      thickness: 1,
+                    ),
                     buildWidget(
                         data: data['AmountDue'].toString(),
                         title: 'Amount Due (in \$ : '),
@@ -203,14 +210,17 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    data['FullName'] != ''
-                        ? buildWidget(data: data['FullName'], title: 'Name : ')
+                    data['FirstName'] != ''
+                        ? buildWidget(
+                            data:
+                                " ${data["FirstName"].toString()} ${data["LastName"].toString()}",
+                            title: 'Name : ')
                         : Container(),
                     const Divider(
                       thickness: 1,
                     ),
                     buildWidget(
-                        data: data['GuestId'].toString(), title: 'Guest ID :'),
+                        data: data['GuestID'].toString(), title: 'Guest ID :'),
                     const Divider(
                       thickness: 1,
                     ),
@@ -270,17 +280,17 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                             ],
                           )
                         : Container(),
-                    data['Country'] != ''
+                    data['Address1'] != ''
                         ? buildWidget(
-                            data: data['Country'].toString(),
-                            title: 'Country :')
+                            data: data['Address1'].toString(),
+                            title: 'Address :')
                         : Container(),
                     const Divider(
                       thickness: 1,
                     ),
-                    data['HomePhone'] != ''
+                    data['Phone'] != ''
                         ? buildWidget(
-                            data: data['HomePhone'].toString(),
+                            data: data['Phone'].toString(),
                             title: 'Mobile Number :')
                         : Container(),
                     SizedBox(height: 5),
@@ -447,19 +457,25 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    data['RoomNames'] != ''
+                    widget.roomsData['RoomName'] != ''
                         ? buildWidget(
-                            data: data['RoomNames'].toString(),
+                            data: widget.roomsData['RoomName'].toString(),
                             title: 'Room Name  :')
+                        : Container(),
+                    SizedBox(height: 5),
+                    widget.roomsData['RoomType'] != ''
+                        ? buildWidget(
+                            data: data['RoomType'].toString(),
+                            title: 'Room Type  :')
                         : Container(),
                     const Divider(
                       thickness: 2,
                     ),
-                    data['ArrDate'] != ''
+                    data['ResArrDate'] != ''
                         ? buildWidget(
                             data: ArrDate.toString(), title: 'Arrival Date :')
                         : Container(),
-                    data['DeptDate'] != ''
+                    data['ResDeptDate'] != ''
                         ? buildWidget(
                             data: DeptDate.toString(),
                             title: 'Departure Date :')
@@ -467,9 +483,9 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                     const Divider(
                       thickness: 1,
                     ),
-                    data['StayLength'] != ''
+                    data['Days'] != ''
                         ? buildWidget(
-                            data: data['StayLength'].toString(),
+                            data: data['Days'].toString(),
                             title: 'Staying Length :')
                         : Container(),
                     const Divider(
@@ -492,7 +508,7 @@ class _PersonDetailsPageState extends State<PersonDetailsPage> {
                               width: 9,
                             ),
                             const Icon(FontAwesomeIcons.person),
-                            Text(data['Adults'].toString()),
+                            Text(data['Infants'].toString()),
                             const SizedBox(
                               width: 9,
                             ),
@@ -524,9 +540,8 @@ class buildWidget extends StatelessWidget {
         Text(title,
             style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                 .copyWith(fontSize: 16, fontWeight: FontWeight.w500)),
-        Container(
+        SizedBox(
           width: Get.width * 0.35,
-          // color: Colors.yellow,
           child: Text(data.toString(),
               textAlign: TextAlign.end,
               style: AppTextStyles.textStyles_PTSans_16_400_Secondary

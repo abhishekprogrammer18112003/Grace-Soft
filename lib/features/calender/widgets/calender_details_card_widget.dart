@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/features/calender/widgets/calender_personal_details_page.dart';
+import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
 
 class CalenderDetailsCardWidget extends StatefulWidget {
   dynamic calenderData;
@@ -43,11 +45,11 @@ class _CalenderDetailsCardWidgetState extends State<CalenderDetailsCardWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) =>
-        //             PersonDetailsPage(data: widget.reservationData)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CalenderPersonDetailsPage(
+                    data: widget.calenderData, roomsData: widget.roomsData)));
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -220,23 +222,60 @@ class _CalenderDetailsCardWidgetState extends State<CalenderDetailsCardWidget> {
         ],
       );
 
-  _buildRoomNumber() => Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  _buildRoomNumber() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.door_back_door_outlined),
-          Text(
-            " ${widget.roomsData['RoomName']}",
-            style: AppTextStyles.textStyles_PTSans_16_400_Secondary.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.indigo),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // const Icon(Icons.door_back_door_outlined),
+              Text(
+                "Room Name : ",
+                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                    .copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
+              ),
+              Container(
+                width: Get.width * 0.4,
+                // color: AppColors.TOAST_ALERT,
+                child: Text(
+                  "${widget.roomsData['RoomName']}",
+                  style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                      .copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepOrange),
+                ),
+              ),
+            ],
           ),
-          Text(
-            " (${widget.roomsData['RoomType']})",
-            style: AppTextStyles.textStyles_PTSans_16_400_Secondary.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.blueGrey),
+          SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Room Type : ",
+                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                    .copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
+              ),
+              Container(
+                width: Get.width * 0.4,
+                // color: AppColors.TOAST_ALERT,
+                child: Text(
+                  " ${widget.roomsData['RoomType']}",
+                  style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                      .copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blueGrey),
+                ),
+              ),
+            ],
           ),
         ],
       );

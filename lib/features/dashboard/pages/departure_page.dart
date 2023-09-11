@@ -43,15 +43,19 @@ class _DeparturePageState extends State<DeparturePage> {
           ? Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-              child: ListView.builder(
-                  itemCount: DepartureList.length,
-                  itemBuilder: (context, index) {
-                    return MemberDetailsCardWidget(
-                      stayoverData: DepartureList[index],
-                      ArrivalData: null,
-                    );
-                  }),
-            )
+              child: DepartureList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: DepartureList.length,
+                      itemBuilder: (context, index) {
+                        return MemberDetailsCardWidget(
+                          stayoverData: DepartureList[index],
+                          ArrivalData: null,
+                        );
+                      })
+                  : Center(
+                      child:
+                          Text('No Departure\'s ${widget.arguements['day']}'),
+                    ))
           : Center(
               child: CircularProgressIndicator(),
             ),

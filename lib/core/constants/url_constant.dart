@@ -2,6 +2,9 @@
 
 const String BASE_URL = "https://gracebeta.com";
 
+const String LOGIN_API =
+    "https://gracebeta.com/PMSUI-trunk/auth/api/Auth/MobileAuthenticate";
+
 //=======================Dashboard======================================
 
 const String DASHBOARD_COUNTS =
@@ -10,7 +13,7 @@ const String DASHBOARD_COUNTS =
 const String STAYOVER_DATA =
     "$BASE_URL/PMSUI-test3/mig/webapi/api/Lists/DashBoardDetails";
 
-const String CHECKEDIN_DATA=
+const String CHECKEDIN_DATA =
     "$BASE_URL/PMSUI-test3/mig/webapi/api/Lists/DashBoardDetails";
 
 //=======================RESERVATION API'S======================================
