@@ -46,7 +46,7 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
           //   size: 30,
           // ),
           actions: [
-            _buildAdd(),
+            // _buildAdd(),
             // _buildSort(),
             Padding(
               padding: const EdgeInsets.only(right: 15.0),

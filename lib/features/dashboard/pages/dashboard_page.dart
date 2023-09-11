@@ -142,6 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
   //=============================Checkedin COUNTS API CALL=============================
   List<dynamic> checkedInList = [];
   getCheckedInCounts(String day) async {
+    checkedInList.clear();
     _countLoading = true;
     String accessToken = AppData.accessToken;
     Map<String, String> headers = {
@@ -162,6 +163,14 @@ class _DashboardPageState extends State<DashboardPage> {
     print(response.body);
     var data = jsonDecode(response.body);
     // checkinCount = 0;
+    if (response.statusCode == 204) {
+      checkedInList.addAll({});
+      // print(data);
+
+      setState(() {
+        _countLoading = false;
+      });
+    }
 
     if (response.statusCode == 200) {
       checkedInList.addAll(data);
@@ -215,7 +224,7 @@ class _DashboardPageState extends State<DashboardPage> {
       print(bookedCount);
       print(vacantCount);
       print(blockedCount);
-
+      print(stayoverCount);
       setState(() {
         _countLoading = false;
       });
