@@ -1,9 +1,15 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
+import 'package:gracesoft/core/constants/app_data.dart';
+import 'package:gracesoft/core/constants/url_constant.dart';
 import 'package:gracesoft/features/dashboard/widgets/member_details_card_widget.dart';
+import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 
 class ArrivalPage extends StatefulWidget {
   Map<String, dynamic> arguements;
@@ -14,22 +20,92 @@ class ArrivalPage extends StatefulWidget {
 }
 
 class _ArrivalPageState extends State<ArrivalPage> {
+  bool _loading = false;
+  List<dynamic> ArrivalList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getArrivalList(widget.arguements['day']);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // automaticallyImplyLeading: false,
         backgroundColor: AppColors.primary,
-        title: Text('${widget.arguements['day']} Arrivals',
+        title: Text('${widget.arguements['day']} Arrival',
             style: TextStyle(fontWeight: FontWeight.w300, color: Colors.white)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
-        child: ListView.builder(
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              return const MemberDetailsCardWidget();
-            }),
-      ),
+      body: !_loading
+          ? Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20),
+              child: ArrivalList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: ArrivalList.length,
+                      itemBuilder: (context, index) {
+                        return MemberDetailsCardWidget(
+                          stayoverData: ArrivalList[index],
+                          ArrivalData: null,
+                        );
+                      })
+                  : Center(
+                      child: Text('No Arrival\'s ${widget.arguements['day']}'),
+                    ))
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
+  }
+
+  Widget _buildArrivalShimmerPlaceholder() {
+    return Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: MemberDetailsCardWidget(
+          stayoverData: {},
+          ArrivalData: null,
+        ));
+  }
+
+  //=========================Arrival Api============================
+  void getArrivalList(String day) async {
+    _loading = true;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String accessToken = AppData.accessToken;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    Map<String, dynamic> body = {
+      "Property": {"PropertyID": AppData.propertyId},
+      "ReportName": "Arrival",
+      "Day": day.toString(),
+    };
+
+    http.Response response = await http.post(Uri.parse(STAYOVER_DATA),
+        headers: headers, body: jsonEncode(body));
+
+    print('============dashboard count ${day}=========');
+    print(response.body);
+    var data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      ArrivalList.addAll(data);
+      setState(() {
+        _loading = false;
+      });
+    } else {
+      Get.snackbar('Something went wrong !',
+          'Something went wrong . Please try again After sometime',
+          backgroundColor: Colors.orange);
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 }

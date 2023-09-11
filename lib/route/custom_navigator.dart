@@ -9,7 +9,6 @@ import 'package:gracesoft/features/housekeeping/pages/housekeeping_page.dart';
 import 'package:gracesoft/features/onboarding/pages/login_page.dart';
 import 'package:gracesoft/features/onboarding/pages/splash_page.dart';
 import 'package:gracesoft/features/reservations/pages/add_reservation_page.dart';
-import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
 import 'package:gracesoft/features/reservations/pages/reservation_entry_page.dart';
 import 'package:gracesoft/nav_screen.dart';
 
@@ -104,11 +103,7 @@ class CustomNavigator {
           builder: (context) => const ReservationEntryPage(),
           settings: settings,
         );
-      case AppPages.personDetailsPage:
-        return MaterialPageRoute(
-          builder: (context) => const PersonDetailsPage(),
-          settings: settings,
-        );
+      
       case AppPages.addReservation:
         return MaterialPageRoute(
           builder: (context) => const AddReservationPage(),

@@ -4,32 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/features/calender/widgets/calender_personal_details_page.dart';
 import 'package:gracesoft/features/reservations/pages/person_details_page.dart';
 
-class ReservationDetailsCardWidget extends StatefulWidget {
-  dynamic reservationData;
-  ReservationDetailsCardWidget({super.key, required this.reservationData});
+class CalenderDetailsCardWidget extends StatefulWidget {
+  dynamic calenderData;
+  dynamic roomsData;
+  Color color;
+  CalenderDetailsCardWidget(
+      {super.key,
+      required this.calenderData,
+      required this.roomsData,
+      required this.color});
 
   @override
-  State<ReservationDetailsCardWidget> createState() =>
-      _ReservationDetailsCardWidgetState();
+  State<CalenderDetailsCardWidget> createState() =>
+      _CalenderDetailsCardWidgetState();
 }
 
-class _ReservationDetailsCardWidgetState
-    extends State<ReservationDetailsCardWidget> {
+class _CalenderDetailsCardWidgetState extends State<CalenderDetailsCardWidget> {
   String? ArrDate;
   String? DeptDate;
+  // late String roomName;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    String arrival = widget.reservationData["ArrDate"];
+
+    String arrival = widget.calenderData["ResArrDate"];
     List<String> arrDate = arrival.split('T');
-    print(arrDate[0]);
+
     ArrDate = arrDate[0];
 
-    String departure = widget.reservationData["DeptDate"];
+    String departure = widget.calenderData["ResDeptDate"];
     List<String> deptDate = departure.split('T');
     DeptDate = deptDate[0];
   }
@@ -41,15 +48,15 @@ class _ReservationDetailsCardWidgetState
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    PersonDetailsPage(data: widget.reservationData)));
+                builder: (context) => CalenderPersonDetailsPage(
+                    data: widget.calenderData, roomsData: widget.roomsData)));
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
           width: Get.width,
           decoration: BoxDecoration(
-            color: widget.reservationData["Status"] != ''
+            color: widget.calenderData['Status'] != ''
                 ? Colors.white
                 : const Color.fromARGB(255, 204, 204, 204),
             borderRadius: BorderRadius.circular(15.0),
@@ -68,29 +75,31 @@ class _ReservationDetailsCardWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildResTag(),
-                    SizedBox(width: Get.width * 0.02),
-                    SizedBox(
-                      width: Get.width * 0.7,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildNamePersonInfoRow(),
-                          const SizedBox(height: 5),
-                          _buildArrival(),
-                          const SizedBox(height: 3),
-                          _buildDates(),
-                          SizedBox(height: Get.height * 0.007),
-                          _buildRoomNumber(),
-                        ],
-                      ),
-                    )
-                  ],
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildResTag(),
+                      SizedBox(width: Get.width * 0.03),
+                      Container(
+                        width: Get.width * 0.7,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildNamePersonInfoRow(),
+                            const SizedBox(height: 5),
+                            _buildArrival(),
+                            const SizedBox(height: 3),
+                            _buildDates(),
+                            SizedBox(height: Get.height * 0.007),
+                            _buildRoomNumber(),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -122,7 +131,7 @@ class _ReservationDetailsCardWidgetState
           child: Center(
             child: RichText(
               text: TextSpan(
-                text: widget.reservationData["ConfirmNum"].toString(),
+                text: widget.calenderData["ConfirmNum"].toString(),
                 style: const TextStyle(
                     color: Colors.white, fontWeight: FontWeight.w800),
               ),
@@ -136,14 +145,21 @@ class _ReservationDetailsCardWidgetState
         children: [
           GestureDetector(
             child: SizedBox(
-              child: Text(
-                " ${widget.reservationData["FullName"].toString()}",
-                style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.primary,
-                    fontSize: 17),
-              ),
-            ),
+                child: widget.calenderData['Status'] != ''
+                    ? Text(
+                        " ${widget.calenderData["FirstName"].toString()} ${widget.calenderData["LastName"].toString()}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.primary,
+                            fontSize: 17),
+                      )
+                    : const Text(
+                        " Auto",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.primary,
+                            fontSize: 17),
+                      )),
           ),
           SizedBox(
               child: Padding(
@@ -152,7 +168,7 @@ class _ReservationDetailsCardWidgetState
               children: [
                 const Icon(Icons.person),
                 const SizedBox(width: 2),
-                Text(widget.reservationData["Guests"].toString())
+                Text(widget.calenderData["Guests"].toString())
               ],
             ),
           ))
@@ -206,19 +222,60 @@ class _ReservationDetailsCardWidgetState
         ],
       );
 
-  _buildRoomNumber() => Row(
+  _buildRoomNumber() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.door_back_door_outlined),
-          const SizedBox(
-            width: 5,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // const Icon(Icons.door_back_door_outlined),
+              Text(
+                "Room Name : ",
+                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                    .copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
+              ),
+              Container(
+                width: Get.width * 0.4,
+                // color: AppColors.TOAST_ALERT,
+                child: Text(
+                  "${widget.roomsData['RoomName']}",
+                  style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                      .copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepOrange),
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            width: Get.width * 0.6,
-            child: Text(
-              "${widget.reservationData["RoomNames"]}",
-              style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                  .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
+          SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Room Type : ",
+                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                    .copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
+              ),
+              Container(
+                width: Get.width * 0.4,
+                // color: AppColors.TOAST_ALERT,
+                child: Text(
+                  " ${widget.roomsData['RoomType']}",
+                  style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+                      .copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blueGrey),
+                ),
+              ),
+            ],
           ),
         ],
       );
@@ -239,7 +296,7 @@ class _ReservationDetailsCardWidgetState
                         style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                             .copyWith(
                                 fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(widget.reservationData["PostTaxTotal"].toString()),
+                    Text(widget.calenderData["PostTaxTotal"].toString()),
                   ],
                 ),
                 Row(
@@ -248,30 +305,36 @@ class _ReservationDetailsCardWidgetState
                         style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                             .copyWith(
                                 fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(widget.reservationData["AmountPaid"].toString()),
+                    Text(widget.calenderData["AmountPaid"].toString()),
                   ],
                 ),
               ],
             ),
 
             // SizedBox(width: Get.width * 0.24),
-            widget.reservationData["Status"] != ''
+            widget.calenderData['Status'] != ""
                 ? Container(
                     height: 30,
                     width: 100,
-                    color: widget.reservationData["Status"] == "CANCELLED"
-                        ? Colors.red
-                        : widget.reservationData["Status"] != "Confirmed"
-                            ? Colors.blue
-                            : Colors.green,
+                    color: widget.color,
                     child: Center(
                         child: Text(
-                      widget.reservationData["Status"],
+                      widget.calenderData["Status"],
                       style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w700),
                     )),
                   )
-                : Container()
+                : Container(
+                    height: 30,
+                    width: 100,
+                    color: widget.color,
+                    child: const Center(
+                        child: Text(
+                      'Blocked',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w700),
+                    )),
+                  ),
           ],
         ),
       );

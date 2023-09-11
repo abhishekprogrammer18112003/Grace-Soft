@@ -42,7 +42,8 @@ class _FilterSearchBottomsheetState extends State<FilterSearchBottomsheet> {
             const SizedBox(height: 10),
             _buildSearchFilter(),
             const SizedBox(height: 20),
-            _buildFromToDate(),
+            // _buildFromToDate(),
+            // _buildReservationType(),
             const SizedBox(height: 20),
             _buildFindButton(),
           ],
@@ -117,117 +118,117 @@ class _FilterSearchBottomsheetState extends State<FilterSearchBottomsheet> {
         ],
       );
 
-  _buildFromToDate() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'From Date',
-                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                    .copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: Get.width * 0.4,
-                height: 50,
-                child: TextFormField(
-                  controller:
-                      fromDateController, //editing controller of this TextField
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    suffixIcon: Icon(Icons.calendar_today), //icon of text field
-                    labelText: "From Date", //label text of field
-                    border: OutlineInputBorder(),
-                  ),
-                  readOnly: true,
-                  //set it true, so that user will not able to edit text
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(
-                            2000), //DateTime.now() - not to allow to choose before today.
-                        lastDate: DateTime(2101));
+  // _buildFromToDate() => Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text(
+  //               'From Date',
+  //               style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+  //                   .copyWith(fontWeight: FontWeight.w500),
+  //             ),
+  //             const SizedBox(height: 6),
+  //             SizedBox(
+  //               width: Get.width * 0.4,
+  //               height: 50,
+  //               child: TextFormField(
+  //                 controller:
+  //                     fromDateController, //editing controller of this TextField
+  //                 autovalidateMode: AutovalidateMode.onUserInteraction,
+  //                 decoration: const InputDecoration(
+  //                   suffixIcon: Icon(Icons.calendar_today), //icon of text field
+  //                   labelText: "From Date", //label text of field
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 readOnly: true,
+  //                 //set it true, so that user will not able to edit text
+  //                 onTap: () async {
+  //                   DateTime? pickedDate = await showDatePicker(
+  //                       context: context,
+  //                       initialDate: DateTime.now(),
+  //                       firstDate: DateTime(
+  //                           2000), //DateTime.now() - not to allow to choose before today.
+  //                       lastDate: DateTime(2101));
 
-                    if (pickedDate != null) {
-                      print(
-                          pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                      String formattedDate =
-                          intl.DateFormat('dd-MM-yyyy').format(pickedDate);
-                      print(
-                          formattedDate); //formatted date output using intl package =>  2021-03-16
-                      //you can implement different kind of Date Format here according to your requirement
+  //                   if (pickedDate != null) {
+  //                     print(
+  //                         pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+  //                     String formattedDate =
+  //                         intl.DateFormat('dd-MM-yyyy').format(pickedDate);
+  //                     print(
+  //                         formattedDate); //formatted date output using intl package =>  2021-03-16
+  //                     //you can implement different kind of Date Format here according to your requirement
 
-                      setState(() {
-                        fromDateController.text =
-                            formattedDate; //set output date to TextField value.
-                      });
-                    } else {
-                      print("Review Date is not selected");
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'To Date',
-                style: AppTextStyles.textStyles_PTSans_16_400_Secondary
-                    .copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: Get.width * 0.4,
-                height: 50,
-                child: TextFormField(
-                  controller:
-                      toDateController, //editing controller of this TextField
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    suffixIcon: Icon(Icons.calendar_today), //icon of text field
-                    labelText: "To Date", //label text of field
-                    border: OutlineInputBorder(),
-                  ),
-                  readOnly: true,
-                  //set it true, so that user will not able to edit text
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(
-                            2000), //DateTime.now() - not to allow to choose before today.
-                        lastDate: DateTime(2101));
+  //                     setState(() {
+  //                       fromDateController.text =
+  //                           formattedDate; //set output date to TextField value.
+  //                     });
+  //                   } else {
+  //                     print("Review Date is not selected");
+  //                   }
+  //                 },
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text(
+  //               'To Date',
+  //               style: AppTextStyles.textStyles_PTSans_16_400_Secondary
+  //                   .copyWith(fontWeight: FontWeight.w500),
+  //             ),
+  //             const SizedBox(height: 6),
+  //             SizedBox(
+  //               width: Get.width * 0.4,
+  //               height: 50,
+  //               child: TextFormField(
+  //                 controller:
+  //                     toDateController, //editing controller of this TextField
+  //                 autovalidateMode: AutovalidateMode.onUserInteraction,
+  //                 decoration: const InputDecoration(
+  //                   suffixIcon: Icon(Icons.calendar_today), //icon of text field
+  //                   labelText: "To Date", //label text of field
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 readOnly: true,
+  //                 //set it true, so that user will not able to edit text
+  //                 onTap: () async {
+  //                   DateTime? pickedDate = await showDatePicker(
+  //                       context: context,
+  //                       initialDate: DateTime.now(),
+  //                       firstDate: DateTime(
+  //                           2000), //DateTime.now() - not to allow to choose before today.
+  //                       lastDate: DateTime(2101));
 
-                    if (pickedDate != null) {
-                      print(
-                          pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                      String formattedDate =
-                          intl.DateFormat('dd-MM-yyyy').format(pickedDate);
-                      print(
-                          formattedDate); //formatted date output using intl package =>  2021-03-16
-                      //you can implement different kind of Date Format here according to your requirement
+  //                   if (pickedDate != null) {
+  //                     print(
+  //                         pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+  //                     String formattedDate =
+  //                         intl.DateFormat('dd-MM-yyyy').format(pickedDate);
+  //                     print(
+  //                         formattedDate); //formatted date output using intl package =>  2021-03-16
+  //                     //you can implement different kind of Date Format here according to your requirement
 
-                      setState(() {
-                        toDateController.text =
-                            formattedDate; //set output date to TextField value.
-                      });
-                    } else {
-                      print("Review Date is not selected");
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
+  //                     setState(() {
+  //                       toDateController.text =
+  //                           formattedDate; //set output date to TextField value.
+  //                     });
+  //                   } else {
+  //                     print("Review Date is not selected");
+  //                   }
+  //                 },
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     );
 
   _buildFindButton() => GestureDetector(
         onTap: () {

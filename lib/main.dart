@@ -21,7 +21,9 @@ class MyApp extends StatelessWidget {
         title: AppData.appName,
         initialRoute: AppPages.appEntry,
         onGenerateRoute: CustomNavigator.controller,
-        theme: ThemeData(appBarTheme: AppBarTheme(color: AppColors.primary)),
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(color: AppColors.primary),
+        ),
         home: const SplashPage());
   }
 }
