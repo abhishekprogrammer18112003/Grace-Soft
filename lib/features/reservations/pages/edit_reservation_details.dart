@@ -19,24 +19,27 @@ import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import '../../../core/constants/url_constant.dart';
 
-class AddReservationPage extends StatefulWidget {
-  const AddReservationPage({super.key});
+class EditReservationPage extends StatefulWidget {
+  dynamic data;
+  EditReservationPage({super.key, required this.data});
 
   @override
-  State<AddReservationPage> createState() => _AddReservationPageState();
+  State<EditReservationPage> createState() => _EditReservationPageState();
 }
 
-class _AddReservationPageState extends State<AddReservationPage> {
+class _EditReservationPageState extends State<EditReservationPage> {
   bool _isLoadingRoomRates = false;
   @override
   void initState() {
     super.initState();
+    print(widget.data);
     initialize();
   }
 
   //=============== initialize =====================
   Future<void> initialize() async {
     await GetRoomRates();
+    await getReservationDetails();
     getCalendarInitialData();
     await GetAccountCodeRates();
   }
@@ -49,7 +52,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
       tax = 0.00,
       miscelleneous = 0.00,
       postTaxTotal = 0.00,
-      amountDue = 0.00;
+      amountDue = 0.00,
+      amountPaid = 0.0;
 
   //=====================Guest Info ===============================
   TextEditingController firstNameController = TextEditingController();
@@ -71,7 +75,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
   TextEditingController notesController = TextEditingController();
   int adults = 0, children = 0, infants = 0;
   List<dynamic> accountCodeList = [];
-
+  String selectedStatus = "";
   List<dynamic> rates = [];
 
   Future<void> _showAccountCodeSelectionDialog(BuildContext context) async {
@@ -111,7 +115,42 @@ class _AddReservationPageState extends State<AddReservationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Reservation'),
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Edit Reservation',
+          style: AppTextStyles.textStyles_PTSans_16_400_Secondary.copyWith(
+              fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        actions: [
+          !_isLoadingRoomRates
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 7.0),
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: DropdownButton<String>(
+                      value: selectedStatus,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedStatus = newValue!;
+                        });
+                      },
+                      items: AppData.status
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
       ),
       body: SingleChildScrollView(
         child: !_isLoadingRoomRates
@@ -124,12 +163,9 @@ class _AddReservationPageState extends State<AddReservationPage> {
                       _booking_summary(),
                       GestureDetector(
                         onTap: () {
-                         
                           if (_formKey.currentState!.validate()) {
-
-                            saveReservation();
+                            editReservation();
                           }
-                         
                         },
                         child: Container(
                           padding: EdgeInsets.all(16.0),
@@ -137,7 +173,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
                             color: AppColors.primary,
                             borderRadius: BorderRadius.circular(12.0),
                           ),
-                          child: Text('Save Reservation',
+                          child: Text('Edit Reservation',
                               style: AppTextStyles
                                   .textStyles_PlusJakartaSans_30_700_Primary
                                   .copyWith(color: Colors.white, fontSize: 16)),
@@ -166,45 +202,12 @@ class _AddReservationPageState extends State<AddReservationPage> {
   bool _isSavingReservation = false;
   dynamic propertyDetails = {};
 
-  //==================Get Property Details==================
-  Future<void> getPropertyDetails() async {
-    String? accessToken = await AppData.getAccessToken();
-    int? propertyID = await AppData.getPropertyID();
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $accessToken',
-    };
-
-    Map<String, dynamic> body = {
-      "PropertyID": propertyID,
-    };
-
-    http.Response response = await http.post(Uri.parse(GET_PROPERTY_DETAILS),
-        headers: headers, body: jsonEncode(body));
-
-    print('============ get PropertyDetails =========');
-    print(response.body);
-    var data;
-    data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      propertyDetails.addAll(data);
-    } else {
-      // _showErrorSnackbar(context, "Something Went Wrong");
-          AppData.showErrorSnackbar( context, "Something went wrong ! Please try again");
-
-      setState(() {
-        _isSavingReservation = false;
-      });
-    }
-  }
-
   //=================SAVE RESERVATION =====================
-  Future<void> saveReservation() async {
+  Future<void> editReservation() async {
     setState(() {
       _isSavingReservation = true;
     });
-    await getPropertyDetails();
-    print(propertyDetails);
+    // await getPropertyDetails();
 
     String? accessToken = await AppData.getAccessToken();
     int? propertyID = await AppData.getPropertyID();
@@ -213,138 +216,257 @@ class _AddReservationPageState extends State<AddReservationPage> {
       'Authorization': 'Bearer $accessToken',
     };
     print("==============Reserved Rooms ===================");
+    print(jsonEncode(reservedRooms));
+    // Map<String, dynamic> body = {
+    //   "CanOverride": false,
+    //   "OverridePasswords": [],
+    //   "Reservation": {
+    // "CheckInDate": "${reservedRooms[0]["StartDate"]}",
+    // "CheckOutDate": "${reservedRooms[0]["EndDate"]}",
+    // "CreatedDate":
+    //     "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+    //     "ReservedRooms": reservedRooms,
+    //     "Adults": adults.toString(),
+    //     "AmountDue": amountDue.toString(),
+    //     "AmountPaid": 0,
+    //     "AutoEmail": 1,
+    //     "CCNo": null,
+    //     "CCType": accountCodeController.text.toString(),
+    //     "CVV": false,
+    //     "CompanyCode": null,
+    //     "CompanyName": null,
+    //     "ConfirmNum": 0,
+    //     "Discount": 0,
+    //     "DiscountType": null,
+    //     "Discounts": [],
+    //     "DocumentAttachment": null,
+    //     "EndTime": null,
+    //     "ExpDate": null,
+    //     "ExpMonth": null,
+    //     "ExpYear": null,
+    //     "ExtraCharges": 0,
+    //     "FolioNo": null,
+    //     "GroupCode": 0,
+    //     "GroupName": null,
+    // "Guest": {
+    //   "Address1": addressController.text.toString(),
+    //   "Address2": "",
+    //   "Anniversary": null,
+    //   "BillingAddress": null,
+    //   "BillingCity": null,
+    //   "BillingProvince": null,
+    //   "BillingState": null,
+    //   "BillingZipPostal": null,
+    //   "BirthDate1": null,
+    //   "BirthDate2": null,
+    //   "CCNumber": null,
+    //   "CCType": accountCodeController.text.toString(),
+    //   "CellPhone": "",
+    //   "City": cityController.text.toString(),
+    //   "Comments": "",
+    //   "CompanyCode": "",
+    //   "Country": countryCodeController.text.toString(),
+    //   "CountryISOCode": "in",
+    //   "CountryPhoneCode": countryCodeController.text.toString(),
+    //   "CreatedDate":
+    //       "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+    //   "Custom1": null,
+    //   "Custom2": null,
+    //   "Custom3": null,
+    //   "Custom4": null,
+    //   "Custom5": null,
+    //   "Custom6": null,
+    //   "DisplayNotes": false,
+    //   "Email": emailController.text.toString(),
+    //   "ExpDt": "",
+    //   "ExpiryDate": null,
+    //   "Fax": "",
+    //   "FirstName": firstNameController.text.toString(),
+    //   "FirstName1": null,
+    //   "FirstStayed": "6/29/2023 12:00:00 AM",
+    //   "GuestCount": 0,
+    //   "GuestID": 0,
+    //   "GuestName": null,
+    //   "GuestType": "",
+    //   "HomePhone": mobileController.text.toString(),
+    //   "Image": "",
+    //   "IsExistingGuest": false,
+    //   "JobTitle": null,
+    //   "LastName": lastNameController.text.toString(),
+    //   "LastName1": null,
+    //   "LastStayed": "11/24/2023 12:00:00 AM",
+    //   "License": null,
+    //   "PropertyID": propertyID,
+    //   "Province": "",
+    //   "ReferralId": null,
+    //   "ScreenName": null,
+    //   "Selected": false,
+    //   "State": stateController.text.toString(),
+    //   "TotalReservation": 1,
+    //   "VehicleMake": null,
+    //   "VehicleModel": null,
+    //   "VisitType": "",
+    //   "WorkPhone": "",
+    //   "Zip": zipController.text.toString()
+    // },
+    //     "Hourly": false,
+    //     "Infants": infants,
+    //     "InvMonth": null,
+    //     "IsIndividualBilling": false,
+    //     "IsMonthly": false,
+    //     "Kids": children.toString(),
+    //     "Mode": "ADD",
+    //     "NoOfGuests": totalGuest.toString(),
+    //     "Notes": "",
+    //     "OtherCharges": 0,
+    //     "PackageId": 0,
+    //     "PageNo": 1,
+    //     "PostTaxTotal": postTaxTotal.toString(),
+    //     "PreTaxTotal": (postTaxTotal - tax).toString(),
+    //     "Property": propertyDetails,
+    //     "Referral": null,
+    //     "RoomAmount": unitTotal.toString(),
+    //     "RoomNames": null,
+    //     "SendMailNow": false,
+    //     "Share": false,
+    //     "Split": false,
+    //     "StartTime": null,
+    //     "Status": "Booked",
+    //     "StayLength": 1,
+    //     "Tax": tax.toString(),
+    //     "TaxExempt": false,
+    //     "TotalHours": 0,
+    //     "UnAssignedRes": false,
+    //     "VrboCancelledBy": null
+    //   },
+    //   "DeletedDiscounts": []
+    // };
     dynamic body = {
-      "CanOverride": false,
-      "OverridePasswords": [],
-      "Reservation": {
-        "CheckInDate": "${reservedRooms[0]["StartDate"]}",
-        "CheckOutDate": "${reservedRooms[0]["EndDate"]}",
+      "Adults": adults.toString(),
+        "AmountDue": amountDue.toString(),
+        "AmountPaid": amountPaid,
+      "AutoEmail": 1,
+      "CCNo": "",
+      "CCType": accountCodeController.text.toString(),
+      "CVV": false,
+      "CheckInDate": "${reservedRooms[0]["StartDate"]}",
+      "CheckOutDate": "${reservedRooms[0]["EndDate"]}",
+      "CreatedDate":
+          "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+      "CompanyCode": "",
+      "CompanyName": "",
+      "ConfirmNum": widget.data["ConfirmNum"],
+      "Discount": 0,
+      "DiscountType": "",
+      "DocumentAttachment": "",
+      "EndTime": "",
+      "ExpDate": "",
+      "ExpMonth": "",
+      "ExpYear": "",
+      "ExtraCharges": extraPersonCharge,
+      "FolioNo": "",
+      "GroupCode": 0,
+      "GroupName": "",
+      "Guest": {
+        "Address1": addressController.text.toString(),
+        "Address2": "",
+        "Anniversary": null,
+        "BillingAddress": null,
+        "BillingCity": null,
+        "BillingProvince": null,
+        "BillingState": null,
+        "BillingZipPostal": null,
+        "BirthDate1": null,
+        "BirthDate2": null,
+        "CCNumber": null,
+        "CCType": accountCodeController.text.toString(),
+        "CellPhone": "",
+        "City": cityController.text.toString(),
+        "Comments": "",
+        "CompanyCode": "",
+        "Country": countryCodeController.text.toString(),
+        "CountryISOCode": "in",
+        "CountryPhoneCode": countryCodeController.text.toString(),
         "CreatedDate":
             "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-        "ReservedRooms": reservedRooms,
-        "Adults": adults.toString(),
-        "AmountDue": amountDue.toString(),
-        "AmountPaid": 0,
-        "AutoEmail": 1,
-        "CCNo": null,
-        "CCType": accountCodeController.text.toString(),
-        "CVV": false,
-        "CompanyCode": null,
-        "CompanyName": null,
-        "ConfirmNum": 0,
-        "Discount": 0,
-        "DiscountType": null,
-        "Discounts": [],
-        "DocumentAttachment": null,
-        "EndTime": null,
-        "ExpDate": null,
-        "ExpMonth": null,
-        "ExpYear": null,
-        "ExtraCharges": 0,
-        "FolioNo": null,
-        "GroupCode": 0,
-        "GroupName": null,
-        "Guest": {
-          "Address1": addressController.text.toString(),
-          "Address2": "",
-          "Anniversary": null,
-          "BillingAddress": null,
-          "BillingCity": null,
-          "BillingProvince": null,
-          "BillingState": null,
-          "BillingZipPostal": null,
-          "BirthDate1": null,
-          "BirthDate2": null,
-          "CCNumber": null,
-          "CCType": accountCodeController.text.toString(),
-          "CellPhone": "",
-          "City": cityController.text.toString(),
-          "Comments": "",
-          "CompanyCode": "",
-          "Country": countryCodeController.text.toString(),
-          "CountryISOCode": "in",
-          "CountryPhoneCode": countryCodeController.text.toString(),
-          "CreatedDate":
-              "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-          "Custom1": null,
-          "Custom2": null,
-          "Custom3": null,
-          "Custom4": null,
-          "Custom5": null,
-          "Custom6": null,
-          "DisplayNotes": false,
-          "Email": emailController.text.toString(),
-          "ExpDt": "",
-          "ExpiryDate": null,
-          "Fax": "",
-          "FirstName": firstNameController.text.toString(),
-          "FirstName1": null,
-          "FirstStayed": "6/29/2023 12:00:00 AM",
-          "GuestCount": 0,
-          "GuestID": 0,
-          "GuestName": null,
-          "GuestType": "",
-          "HomePhone": mobileController.text.toString(),
-          "Image": "",
-          "IsExistingGuest": false,
-          "JobTitle": null,
-          "LastName": lastNameController.text.toString(),
-          "LastName1": null,
-          "LastStayed": "11/24/2023 12:00:00 AM",
-          "License": null,
-          "PropertyID": propertyID,
-          "Province": "",
-          "ReferralId": null,
-          "ScreenName": null,
-          "Selected": false,
-          "State": stateController.text.toString(),
-          "TotalReservation": 1,
-          "VehicleMake": null,
-          "VehicleModel": null,
-          "VisitType": "",
-          "WorkPhone": "",
-          "Zip": zipController.text.toString()
-        },
-        "Hourly": false,
-        "Infants": infants,
-        "InvMonth": null,
-        "IsIndividualBilling": false,
-        "IsMonthly": false,
-        "Kids": children,
-        "Mode": "ADD",
-        "NoOfGuests": totalGuest,
-        "Notes": "",
-        "OtherCharges": 0,
-        "PackageId": 0,
-        "PageNo": 1,
-        "PostTaxTotal": postTaxTotal,
-        "PreTaxTotal": (postTaxTotal - tax),
-        "Property": propertyDetails,
-        "Referral": null,
-        "RoomAmount": unitTotal,
-        "RoomNames": null,
-        "SendMailNow": false,
-        "Share": false,
-        "Split": false,
-        "StartTime": null,
-        "Status": "Booked",
-        "StayLength": 1,
-        "Tax": tax,
-        "TaxExempt": false,
-        "TotalHours": 0,
-        "UnAssignedRes": false,
-        "VrboCancelledBy": null
+        "Custom1": null,
+        "Custom2": null,
+        "Custom3": null,
+        "Custom4": null,
+        "Custom5": null,
+        "Custom6": null,
+        "DisplayNotes": false,
+        "Email": emailController.text.toString(),
+        "ExpDt": "",
+        "ExpiryDate": null,
+        "Fax": "",
+        "FirstName": firstNameController.text.toString(),
+        "FirstName1": null,
+        "FirstStayed": "6/29/2023 12:00:00 AM",
+        "GuestCount": 0,
+        "GuestID": guestDetails["GuestID"],
+        "GuestName": null,
+        "GuestType": "",
+        "HomePhone": mobileController.text.toString(),
+        "Image": "",
+        "IsExistingGuest": false,
+        "JobTitle": null,
+        "LastName": lastNameController.text.toString(),
+        "LastName1": null,
+        "LastStayed": "11/24/2023 12:00:00 AM",
+        "License": null,
+        "PropertyID": propertyID,
+        "Province": "",
+        "ReferralId": null,
+        "ScreenName": null,
+        "Selected": false,
+        "State": stateController.text.toString(),
+        "TotalReservation": 1,
+        "VehicleMake": null,
+        "VehicleModel": null,
+        "VisitType": "",
+        "WorkPhone": "",
+        "Zip": zipController.text.toString()
       },
-      "DeletedDiscounts": []
+      "Hourly": false,
+      "Infants": infants,
+      "InvMonth": null,
+      "IsIndividualBilling": true,
+      "IsMonthly": false,
+      "Kids": children,
+      "Mode": "MODIFY",
+      "NoOfGuests": totalGuest,
+      "Notes": notesController.text,
+      "OtherCharges": miscelleneous,
+      "PackageId": 0,
+      "PageNo": 1,
+      "PostTaxTotal": postTaxTotal,
+      "PreTaxTotal": (postTaxTotal - tax),
+      "Property": propertyDetails,
+      "Referral": null,
+      "ReservedRooms":reservedRooms,
+      "RoomAmount": unitTotal,
+      "RoomNames": null,
+      "SendMailNow": false,
+      "Share": false,
+      "Split": false,
+      "StartTime": "",
+      "Status": selectedStatus.toString(),
+      "StayLength": 1,
+      "Tax": tax,
+      "TaxExempt": false,
+      "TotalHours": 0,
+      "UnAssignedRes": false
     };
-
     print(
         "==========================================Body=========================================");
     print(body);
-    http.Response response = await http.post(Uri.parse(SAVE_RESERVATION),
+    http.Response response = await http.post(Uri.parse(EDIT_RESERVATION),
         headers: headers, body: jsonEncode(body));
-    print('============ Saving Data =========');
-
+    print('============ Editing Data =========');
+// print(jsonEncode(reservedRooms));
+    // print(response.body);
+    // var data = jsonEncode(response.body);
     try {
       if (response.statusCode == 200) {
         setState(() {
@@ -353,7 +475,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
         // print(body);
         print("=====================Printing body response ==================");
         Utils.printJson(response.body);
-        Navigator.pop(context);
+         Navigator.pop(context);
         Navigator.pop(context);
         Navigator.push(context , MaterialPageRoute(builder: (context)=>BottomNavigationBarWidget(initialIndex: 1,)));
         print("Reservation Saved Successfully");
@@ -361,7 +483,8 @@ class _AddReservationPageState extends State<AddReservationPage> {
     } catch (e) {
       print(e);
       // _showErrorSnackbar(context, "Something Went Wrong");
-          AppData.showErrorSnackbar( context, "Something went wrong ! Please try again");
+      AppData.showErrorSnackbar(
+          context, "Something went wrong ! Please try again");
 
       setState(() {
         _isSavingReservation = false;
@@ -687,7 +810,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
           ),
 
           // const SizedBox(),
-          Text(reservedRooms[index]["StartDate"]),
+          Text(reservedRooms[index]["StartDate"].split("T")[0]),
           const SizedBox(width: 10),
           SizedBox(
             width: Get.width * 0.2,
@@ -695,7 +818,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
 
           Padding(
             padding: const EdgeInsets.only(right: 50.0),
-            child: Text(reservedRooms[index]["EndDate"]),
+            child: Text(reservedRooms[index]["EndDate"].split("T")[0]),
           ),
         ],
       );
@@ -800,8 +923,6 @@ class _AddReservationPageState extends State<AddReservationPage> {
                 SizedBox(
                   width: Get.width * 0.18,
                 ),
-
-              
               ],
             )
           ],
@@ -1215,7 +1336,7 @@ class _AddReservationPageState extends State<AddReservationPage> {
                       height: 8,
                     ),
                     PaymentSummaryShowTextWidget(
-                        data: 0.0, text: "Amount Paid"),
+                        data: amountPaid, text: "Amount Paid"),
                     SizedBox(
                       height: 8,
                     ),
@@ -1231,8 +1352,77 @@ class _AddReservationPageState extends State<AddReservationPage> {
           ),
         ),
       );
+//============================== GET RESERVATION DETAILS ===================================
+  dynamic reservationDetails = {};
+  dynamic guestDetails = {};
+  Future<void> getReservationDetails() async {
+    setState(() {
+      _isLoadingRoomRates = true;
+    });
+    String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
 
-  
+    dynamic body = {
+      "ConfirmNum": widget.data["ConfirmNum"],
+      "InvMonth": null,
+      "Property": {"PropertyID": propertyID}
+    };
+
+    http.Response response = await http.post(Uri.parse(GET_RESERVATION_DETAILS),
+        headers: headers, body: jsonEncode(body));
+
+    var data = jsonDecode(response.body);
+    print(
+        "===================Get Reservation details=============================");
+
+    if (response.statusCode == 200) {
+      setState(() {
+        reservationDetails = data["Reservation"];
+        propertyDetails = data["Reservation"]["Property"];
+        guestDetails = data["Reservation"]["Guest"];
+        reservedRooms = data["ReservedRooms"];
+        firstNameController.text = guestDetails["FirstName"];
+        lastNameController.text = guestDetails["LastName"];
+        addressController.text = guestDetails["Address1"];
+        cityController.text = guestDetails["City"];
+        stateController.text = guestDetails["State"];
+        zipController.text = guestDetails["Zip"];
+        countryController.text = guestDetails["Country"];
+        countryCodeController.text = guestDetails["CountryPhoneCode"];
+        mobileController.text = guestDetails["HomePhone"];
+        emailController.text = guestDetails["Email"];
+
+        accountCodeController.text = reservationDetails["CCType"];
+        notesController.text = reservationDetails["Notes"];
+        unitTotal = reservationDetails["RoomAmount"].toDouble();
+        extraPersonCharge = reservationDetails["ExtraCharges"].toDouble();
+        tax = reservationDetails["Tax"].toDouble();
+        miscelleneous = reservationDetails["OtherCharges"].toDouble();
+        postTaxTotal = reservationDetails["PostTaxTotal"].toDouble();
+        amountDue = reservationDetails["AmountDue"].toDouble();
+        amountPaid = reservationDetails["AmountPaid"].toDouble();
+        adults = reservationDetails["Adults"];
+        children = reservationDetails["Kids"];
+        infants = reservationDetails["Infants"];
+        totalGuest = reservationDetails["NoOfGuests"];
+        selectedStatus = reservationDetails["Status"];
+      });
+      print(reservedRooms);
+
+      setState(() {
+        _isLoadingRoomRates = false;
+      });
+    } else {
+      print("ERROR");
+      setState(() {
+        _isLoadingRoomRates = false;
+      });
+    }
+  }
 
   //====================== GET ROOM RATES ============================
   Future<void> GetRoomRates() async {
@@ -1265,16 +1455,15 @@ class _AddReservationPageState extends State<AddReservationPage> {
             _isLoadingRoomRates = false;
           });
         } else {
-          
-          AppData.showErrorSnackbar( context, "Something went wrong ! Please try again");
+          AppData.showErrorSnackbar(
+              context, "Something went wrong ! Please try again");
 
           setState(() {
             _isLoadingRoomRates = false;
           });
         }
       } catch (e) {
-      
-          AppData.showErrorSnackbar( context, e.toString());
+        AppData.showErrorSnackbar(context, e.toString());
 
         setState(() {
           _isLoadingRoomRates = false;
@@ -1322,14 +1511,15 @@ class _AddReservationPageState extends State<AddReservationPage> {
         } else {
           // _showErrorSnackbar(
           //     context, "Something Went Wrong ! Please Try Again.");
-          AppData.showErrorSnackbar( context, "Something went wrong ! Please try again");
+          AppData.showErrorSnackbar(
+              context, "Something went wrong ! Please try again");
           setState(() {
             _isLoadingRoomRates = false;
           });
         }
       } catch (e) {
         // _showErrorSnackbar(context, e.toString());
-          AppData.showErrorSnackbar( context, e.toString());
+        AppData.showErrorSnackbar(context, e.toString());
 
         setState(() {
           _isLoadingRoomRates = false;
@@ -1412,65 +1602,3 @@ class PaymentSummaryShowTextWidget extends StatelessWidget {
     );
   }
 }
-
-// ==================Card Numberr=================
-
-// Container(
-//   height: 55,
-//   decoration: BoxDecoration(
-//     border: Border.all(color: Colors.grey),
-//     borderRadius: BorderRadius.circular(8.0),
-//   ),
-//   child: TextFormField(
-//     controller: cardNumberController,
-//     keyboardType: TextInputType.phone,
-//     decoration: const InputDecoration(
-//       hintText: 'Card Number',
-//       border: InputBorder.none,
-//       contentPadding: EdgeInsets.all(16.0),
-//     ),
-//   ),
-// ),
-// SizedBox(
-//   height: 5,
-// ),
-// //=========================Month And Year =======================z
-// Row(
-//   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//   children: [
-//     Container(
-//       height: 55,
-//       width: Get.width * 0.35,
-//       decoration: BoxDecoration(
-//         border: Border.all(color: Colors.grey),
-//         borderRadius: BorderRadius.circular(8.0),
-//       ),
-//       child: TextFormField(
-//         controller: MMController,
-//         keyboardType: TextInputType.phone,
-//         decoration: const InputDecoration(
-//           hintText: 'Month',
-//           border: InputBorder.none,
-//           contentPadding: EdgeInsets.all(16.0),
-//         ),
-//       ),
-//     ),
-//     Container(
-//       height: 55,
-//       width: Get.width * 0.5,
-//       decoration: BoxDecoration(
-//         border: Border.all(color: Colors.grey),
-//         borderRadius: BorderRadius.circular(8.0),
-//       ),
-//       child: TextFormField(
-//         controller: YYController,
-//         keyboardType: TextInputType.phone,
-//         decoration: const InputDecoration(
-//           hintText: 'Year',
-//           border: InputBorder.none,
-//           contentPadding: EdgeInsets.all(16.0),
-//         ),
-//       ),
-//     ),
-//   ],
-// ),

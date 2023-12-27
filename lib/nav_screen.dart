@@ -22,7 +22,7 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
     const DashboardPage(),
     const ReservationEntryPage(),
     const CalenderPage(),
-    const HouseKeepingPage(),
+    HouseKeepingPage(),
   ];
 
   int _selectedIndex = 0;
@@ -89,7 +89,7 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
             ),
             BottomNavigationBarItem(
               backgroundColor: AppColors.primary,
-              icon: Icon(Icons.house),
+              icon: Icon(Icons.co_present_outlined),
               label: 'Housekeeping',
             ),
           ],

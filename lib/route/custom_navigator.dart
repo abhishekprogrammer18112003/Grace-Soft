@@ -111,7 +111,7 @@ class CustomNavigator {
         );
       case AppPages.housekeeping:
         return MaterialPageRoute(
-          builder: (context) => const HouseKeepingPage(),
+          builder: (context) =>  HouseKeepingPage(),
           settings: settings,
         );
 

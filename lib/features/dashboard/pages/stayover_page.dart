@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -55,7 +55,7 @@ class _StayoverPageState extends State<StayoverPage> {
                   : Center(
                       child: Text('No Stayovers ${widget.arguements['day']}'),
                     ))
-          : Center(
+          : const Center(
               child: CircularProgressIndicator(),
             ),
     );
@@ -71,18 +71,36 @@ class _StayoverPageState extends State<StayoverPage> {
         ));
   }
 
+  
+       void _showErrorSnackbar(BuildContext context , String error ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error),
+        duration: Duration(seconds: 3), // Adjust the duration as needed
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
   //=========================StayOver Api============================
   void getStayoverList(String day) async {
-    _loading = true;
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    String accessToken = AppData.accessToken;
+   setState(() {
+     _loading = true;
+   });
+ String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
 
     Map<String, dynamic> body = {
-      "Property": {"PropertyID": AppData.propertyId},
+      "Property": {"PropertyID": propertyID},
       "ReportName": "Stayover",
       "Day": day.toString(),
     };
@@ -92,20 +110,36 @@ class _StayoverPageState extends State<StayoverPage> {
 
     print('============dashboard count ${day}=========');
     print(response.body);
-    var data = jsonDecode(response.body);
+    var data;
+    if (response.body.isNotEmpty) {
+      data = jsonDecode(response.body);
+      try {
+        if (response.statusCode == 200) {
+          stayOverList.addAll(data);
+          setState(() {
+            _loading = false;
+          });
+        } else {
+          _showErrorSnackbar(context,"Something went wrong ! Please try again");
+          setState(() {
+            _loading = false;
+          });
+        }
+      } catch (e) {
 
-    if (response.statusCode == 200) {
-      stayOverList.addAll(data);
+        _showErrorSnackbar(context, e.toString());
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+    else{
+      stayOverList.clear();
       setState(() {
-        _loading = false;
-      });
-    } else {
-      Get.snackbar('Something went wrong !',
-          'Something went wrong . Please try again After sometime',
-          backgroundColor: Colors.orange);
-      setState(() {
-        _loading = false;
-      });
+          _loading = false;
+        });
+
+      
     }
   }
 }

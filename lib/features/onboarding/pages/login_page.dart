@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, unused_import
+// ignore_for_file: camel_case_types, unused_import, use_build_context_synchronously, deprecated_member_use, await_only_futures
 
 import 'dart:async';
 import 'dart:convert';
@@ -14,6 +14,8 @@ import 'package:gracesoft/route/app_pages.dart';
 import 'package:gracesoft/route/custom_navigator.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -61,30 +63,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  // _buildHeader() => Padding(
-  //       padding: const EdgeInsets.all(20),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Text(
-  //             "Login",
-  //             style: AppTextStyles.textStyles_PTSans_16_400_Secondary.copyWith(
-  //                 fontSize: 30,
-  //                 color: AppColors.white,
-  //                 fontWeight: FontWeight.w700),
-  //           ),
-  //           Text(
-  //             "Welcome Back",
-  //             style: AppTextStyles.textStyles_PlusJakartaSans_30_700_Primary
-  //                 .copyWith(
-  //                     fontSize: 15,
-  //                     fontWeight: FontWeight.w400,
-  //                     color: AppColors.white),
-  //           ),
-  //         ],
-  //       ),
-  //     );
 
   _buildHeader() => Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
@@ -137,8 +115,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 20),
                     _buildForm(),
-                    const SizedBox(height: 20),
-                    _buildForgotPassword(),
                     const SizedBox(height: 30),
                     _buildLoginButton(),
                     const SizedBox(height: 20),
@@ -149,15 +125,15 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Login With ? ',
+                      'Don\'t have an account ? ',
                       style: AppTextStyles.textStyles_Puritan_30_400_Secondary
                           .copyWith(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.primary),
+                              color: AppColors.grey),
                     ),
                     const SizedBox(height: 15),
-                    _buildFooter(),
+                    _buildSignUpButton(),
                   ],
                 ),
               ),
@@ -182,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Property Name is required.';
+                return 'Short Name is required.';
               }
               return null;
             },
@@ -193,7 +169,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
           TextFormField(
             controller: nameController,
-            // textInputAction: TextInputAction.next,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               hintText: 'Name',
@@ -204,9 +179,8 @@ class _LoginPageState extends State<LoginPage> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
             validator: (value) {
-              // Validators.name(value);
               if (value == null || value.trim().isEmpty) {
-                return 'Name is Required.';
+                return 'Login Name is Required.';
               }
               return null;
             },
@@ -222,7 +196,8 @@ class _LoginPageState extends State<LoginPage> {
               hintText: 'Password',
               focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.primary, width: 1.5)),
+                  borderSide:
+                      const BorderSide(color: AppColors.primary, width: 1.5)),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               suffixIcon: IconButton(
@@ -237,7 +212,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             validator: (value) {
-              // Validators.password(value);
               if (value == null || value.trim().isEmpty) {
                 return 'Password is required.';
               }
@@ -245,11 +219,6 @@ class _LoginPageState extends State<LoginPage> {
             },
           )
         ],
-      );
-
-  _buildForgotPassword() => const Text(
-        "Forgot Password?",
-        style: TextStyle(color: Colors.grey),
       );
 
   _buildLoginButton() => GestureDetector(
@@ -279,13 +248,41 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-  _buildFooter() => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-              height: 40, width: 40, child: Image.asset(AppIcons.google_icon))
-        ],
+  _buildSignUpButton() => GestureDetector(
+        onTap: () {
+         launchUrl(url: "https://www.gracesoft.com/freetrial");
+        },
+        child: Container(
+          height: 50,
+          width: 160,
+          margin: const EdgeInsets.symmetric(horizontal: 50),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(width: 3, color: AppColors.primary),
+          ),
+          child: const Center(
+              child: Text(
+            'Sign Up',
+            style: TextStyle(
+                fontWeight: FontWeight.w700, color: AppColors.primary),
+          )),
+        ),
       );
+
+  void _showErrorSnackbar(BuildContext context, String error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error),
+        duration: Duration(seconds: 3), // Adjust the duration as needed
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
 
   void _login() {
     if (_formKey.currentState!.validate()) {
@@ -293,46 +290,19 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //Api Integration
-  // void validateLogin() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   // SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   print(propertyShortNameController.text);
-  //   print(nameController.text);
-  //   print(passwordController.text);
-
-  //   Map<String, dynamic> bodytosend = {
-  //     "ShortName": propertyShortNameController.text.toString(),
-  //     "UserName": nameController.text.toString(),
-  //     "Password": passwordController.text.toString(),
-  //   };
-
-  //   http.Response response =
-  //       await http.post(Uri.parse(LOGIN_API), body: (bodytosend));
-
-  //   print(response.body);
-  //   var data = jsonDecode(response.body);
-
-  //   if (response.statusCode == 200) {
-  //     print("response");
-  //     AppData.accessToken = data['accessToken'];
-  //     AppData.propertyId = data['propertyId'];
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     CustomNavigator.pushReplace(context, AppPages.navigationBar);
-  //   } else {
-  //     print("error");
-  //     Get.snackbar('Something went wrong !',
-  //         'Something went wrong . Please try again After sometime',
-  //         backgroundColor: Colors.orange);
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
+   Future<void> launchUrl({
+    required String url,
+  
+  }) async {
+    try {
+      await url_launcher.launchUrl(
+        Uri.parse(url),
+        mode: url_launcher.LaunchMode.externalNonBrowserApplication,
+      );
+    } catch (e) {
+      _showErrorSnackbar(context , e.toString());
+    }
+  }
 
   Future<void> validateLogin() async {
     setState(() {
@@ -349,34 +319,52 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await dio.post(LOGIN_API, data: requestBody);
-      print(response.data);
+  
 
-      if (response.statusCode == 200) {
-        print("response");
-        AppData.accessToken = response.data['accessToken'];
-        AppData.propertyId = int.parse(response.data['propertyId']);
-        print(AppData.accessToken);
-        print(AppData.propertyId);
-        // setState(() {
-        //   _isLoading = false;
-        // });
-        CustomNavigator.pushReplace(context, AppPages.navigationBar);
+      if (response.statusCode == 200)  {
+
+        if (response.data['details'] == "Success") {
+          String dateTime  = DateTime.now().toString();
+          AppData.setTokenAndPropertyID(response.data['accessToken'],int.parse(response.data['propertyId']) , dateTime);
+          // AppData.accessToken = response.data['accessToken'];
+          // AppData.propertyId = int.parse(response.data['propertyId']);
+          saveStatus();
+
+          
+        } else {
+          _showErrorSnackbar(
+              context, "Something wrong with details you entered !");
+               setState(() {
+          _isLoading = false;
+        });
+        }
       } else {
-        print("error");
-        Get.snackbar('Something went wrong !',
-            'Something went wrong. Please try again after some time',
-            backgroundColor: Colors.orange);
+
+        _showErrorSnackbar(context, "Something went wrong ! Please try again.");
         setState(() {
           _isLoading = false;
         });
       }
     } catch (error) {
-      print("error : ${error}");
-      Get.snackbar('Network Error', 'An error occurred. Please try again.',
-          backgroundColor: Colors.red);
+   
+
+      _showErrorSnackbar(context, error.toString());
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+
+  Future<void> saveStatus()async{
+    SharedPreferences user = await SharedPreferences.getInstance();
+    user.setBool("isLogin", true);
+
+    print("status saved==============");
+    CustomNavigator.pushReplace(context, AppPages.navigationBar);
+
+           setState(() {
+          _isLoading = false;
+        });
   }
 }

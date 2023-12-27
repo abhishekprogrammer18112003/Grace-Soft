@@ -86,7 +86,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               builder: (context, snapshot) {
                 bool focused = snapshot.data!;
                 return Container(
-                  // height:
+                  height: 70,
                   //     widget.errorText != null && widget.errorText!.isNotEmpty
                   //         ? 59.h
                   //         : 70.h,
@@ -110,6 +110,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       onChanged: widget.onChanged,
                       onFieldSubmitted: widget.onSubmitted,
                       textInputAction: widget.textInputAction,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       // onSubmitted: widget.onSubmitted,
                       controller: widget.controller,
                       validator: widget.validator,
@@ -130,14 +131,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         fillColor: focused ? null : widget.fillColor,
                         hintStyle: AppTextStyles
                             .textStyles_PTSans_16_400_Secondary
-                            .copyWith(fontSize: 14),
+                            .copyWith(fontSize: 16),
                         errorStyle: const TextStyle(
                           fontSize: 14,
                         ),
                         counterText: "",
                         isDense: true,
                         // border: buildBorder(),
-                        border: InputBorder.none,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(widget.borderRadius)
+                        ),
                         // enabledBorder: buildBorder(),
                         // focusedBorder: buildBorder(AppColors.primary),
                         // disabledBorder: buildBorder(),

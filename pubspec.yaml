@@ -42,11 +42,16 @@ dependencies:
   flutter_svg: ^2.0.7
   intl: ^0.18.1
   shared_preferences: ^2.2.0
-  http: ^1.1.0
+  http:
   shimmer: ^3.0.0
   pie_chart: ^5.3.2
   font_awesome_flutter: ^10.5.0
   dio: ^5.3.2
+  open_street_map_search_and_pick: 
+  geolocator: ^9.0.2
+  permission_handler: ^10.2.0
+  url_launcher: ^6.1.14
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:

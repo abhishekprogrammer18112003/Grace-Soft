@@ -4,7 +4,6 @@ import 'package:gracesoft/core/constants/app_colors.dart';
 import 'package:gracesoft/core/constants/app_data.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
 import 'package:gracesoft/core/constants/url_constant.dart';
-import 'package:gracesoft/features/reservations/widgets/filter_search_bottomsheet.dart';
 import 'package:gracesoft/features/reservations/widgets/reservation_details_card_widget.dart';
 import 'package:gracesoft/route/app_pages.dart';
 import 'package:gracesoft/route/custom_navigator.dart';
@@ -40,14 +39,10 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.primary,
-          // leading: const Icon(
-          //   Icons.how_to_vote_outlined,
-          //   color: Colors.white,
-          //   size: 30,
-          // ),
+      
           actions: [
             _buildAdd(),
-            // _buildSort(),
+
             Padding(
               padding: const EdgeInsets.only(right: 15.0),
               child: GestureDetector(
@@ -77,6 +72,11 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
                     sortBySelectedItem = c;
                     searchController = d;
                   });
+                  print(a.toString());
+                  print(
+                    b.toString()
+                  );
+                  print(c.toString());
                   getReservationList();
                 },
               ),
@@ -109,13 +109,6 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
     );
   }
 
-  // _buildReservationList() => ListView.builder(
-  //     itemCount: reservationList.length,
-  //     itemBuilder: (context, index) {
-  //       return ReservationDetailsCardWidget(
-  //         reservationData: reservationList[index],
-  //       );
-  //     });
 
   _buildReservationList() => Column(
         children: [
@@ -126,7 +119,7 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
 
   _buildAdd() => GestureDetector(
         onTap: () {
-          // CustomNavigator.pushTo(context, AppPages.addReservation);
+          CustomNavigator.pushTo(context, AppPages.addReservation);
         },
         child: const Padding(
           padding: EdgeInsets.only(right: 22.0),
@@ -136,29 +129,7 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
           ),
         ),
       );
-  // _buildSearch() => GestureDetector(
-  //       onTap: () {
-  //         showModalBottomSheet<dynamic>(
-  //             shape: const RoundedRectangleBorder(
-  //                 borderRadius:
-  //                     BorderRadius.vertical(top: Radius.circular(45))),
-  //             isScrollControlled: false,
-  //             context: context,
-  //             builder: (BuildContext bc) {
-  //               return const Padding(
-  //                   padding: EdgeInsets.symmetric(vertical: 25, horizontal: 5),
-  //                   child: FilterSearchBottomsheet());
-  //             });
-  //       },
-  //       child: const Padding(
-  //         padding: EdgeInsets.only(right: 25.0),
-  //         child: Icon(
-  //           Icons.search,
-  //           size: 25,
-  //         ),
-  //       ),
-  //     );
-
+ 
   //=============================RESERVATION API CALL=============================
 
   void getReservationList() async {
@@ -214,14 +185,15 @@ class _ReservationEntryPageState extends State<ReservationEntryPage> {
     if (sortBySelectedItem == 'Home Phone') {
       SortString = 'HomePhone';
     }
-    String accessToken = AppData.accessToken;
+   String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
 
     Map<String, dynamic> body = {
-      "PropertyId": AppData.propertyId,
+      "PropertyId": propertyID,
       "FilterType": FilterType,
       "FilterValue": searchController,
       "StatusFilter": "ALL",
@@ -413,7 +385,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Sort By',
+                'Filter By',
                 style: AppTextStyles.textStyles_PTSans_16_400_Secondary
                     .copyWith(fontWeight: FontWeight.w500, fontSize: 14),
               ),

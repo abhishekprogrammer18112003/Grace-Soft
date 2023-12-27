@@ -1,9 +1,12 @@
 // import 'dart:js';
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_text_styles.dart';
+import 'package:gracesoft/features/reservations/pages/edit_reservation_details.dart';
 
 // ignore: must_be_immutable
 class CalenderPersonDetailsPage extends StatefulWidget {
@@ -40,6 +43,15 @@ class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
       appBar: AppBar(
         title: const Text('Person Details'),
         actions: [
+
+          GestureDetector(
+            onTap: (){
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Implement the edit action
+                  _handleEdit();
+                },
+                child: Icon(Icons.edit),
+          ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -116,7 +128,7 @@ class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
                     data['RoomRate'] != ''
                         ? buildWidget(
                             data: data['RoomRate'].toString(),
-                            title: 'Room Rate (in \$) : ')
+                            title: 'Room Rate : ')
                         : Container(),
                     // SizedBox(height: 5),
                     // data['OtherCharges'] != ''
@@ -144,20 +156,20 @@ class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
                     data['PostTaxTotal'] != ''
                         ? buildWidget(
                             data: data['PostTaxTotal'].toString(),
-                            title: 'Post Tax Total (in \$) :')
+                            title: 'Post Tax Total :')
                         : Container(),
                     const Divider(
                       thickness: 1,
                     ),
                     buildWidget(
                         data: data['AmountPaid'].toString(),
-                        title: 'Amount Paid (in \$) :'),
+                        title: 'Amount Paid :'),
                     const Divider(
                       thickness: 1,
                     ),
                     buildWidget(
                         data: data['AmountDue'].toString(),
-                        title: 'Amount Due (in \$ : '),
+                        title: 'Amount Due :',)
                   ],
                 ),
               )
@@ -339,79 +351,6 @@ class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
         ),
       );
 
-  _payment_summary(dynamic data) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14.0),
-          color: Colors.deepPurple,
-          boxShadow: [
-            BoxShadow(
-              color: const Color.fromARGB(198, 135, 133, 133).withOpacity(0.5),
-              spreadRadius: 4,
-              blurRadius: 6,
-              offset: const Offset(0, 9), // changes position of shadow
-            ),
-          ],
-        ),
-        margin: const EdgeInsets.all(10),
-        width: double.infinity,
-        child: Card(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(5),
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.deepPurple,
-                ),
-                child: const Text(
-                  "Payment Info",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    data['CCType'] != ''
-                        ? buildWidget(
-                            data: data['CCType'].toString(),
-                            title: 'Payment Type :')
-                        : Container(),
-                    const Divider(
-                      thickness: 1,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Container(
-                        width: double.infinity,
-                        child: Text(
-                          "PAY AMOUNT DUE",
-                          style: AppTextStyles
-                              .textStyles_PTSans_16_400_Secondary
-                              .copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.w700),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      );
 
   _room_summary(dynamic data) => Container(
         decoration: BoxDecoration(
@@ -525,6 +464,14 @@ class _CalenderPersonDetailsPageState extends State<CalenderPersonDetailsPage> {
           ),
         ),
       );
+      void _handleEdit() {
+    // Implement the edit action here
+    
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => EditReservationPage(data : widget.data)));
+    print('Edit action');
+  }
+  
 }
 
 class buildWidget extends StatelessWidget {
@@ -549,5 +496,7 @@ class buildWidget extends StatelessWidget {
         ),
       ],
     );
+    
   }
+  
 }

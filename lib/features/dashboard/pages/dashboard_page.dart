@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gracesoft/core/constants/app_colors.dart';
@@ -6,6 +8,8 @@ import 'package:gracesoft/core/constants/app_text_styles.dart';
 import 'package:gracesoft/core/constants/url_constant.dart';
 import 'package:gracesoft/features/dashboard/widgets/custom_switch_button.dart';
 import 'package:gracesoft/features/dashboard/widgets/main_dashboard_widget.dart';
+import 'package:gracesoft/route/app_pages.dart';
+import 'package:gracesoft/route/custom_navigator.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -50,17 +54,17 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         automaticallyImplyLeading: false,
-        // leading: const Icon(
-        //   Icons.hotel,
-        //   color: Colors.white,
-        //   size: 30,
-        // ),
-        // actions: const [
-        //   Padding(
-        //     padding: EdgeInsets.only(right: 13.0),
-        //     child: Icon(Icons.refresh),
-        //   ),
-        // ],
+       actions: [
+        GestureDetector(
+          onTap: (){
+            _showLogoutDialog(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right : 12.0),
+            child: Icon(Icons.logout),
+          ),
+        ),
+       ],
         title: Text('Dashboard',
             style: AppTextStyles.textStyles_Puritan_30_400_Secondary.copyWith(
                 color: Colors.white,
@@ -112,13 +116,42 @@ class _DashboardPageState extends State<DashboardPage> {
                     blockedCount: blockedCount!,
                     stayoverCount: stayoverCount!,
                     day: _selectedButton,
-                    checkInCount: checkedInList.length,
+                    checkInCount: checkedInList.isEmpty ? 0  :  checkedInList.length,
                     checkedInData: checkedInList,
                   )
                 : _buildCountShimmerPlaceholder(),
           ],
         ),
       ),
+    );
+  }
+
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Logout Confirmation'),
+          content: Text('Do you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                CustomNavigator.pushReplace(context, AppPages.login);
+                Navigator.of(context).pop(); 
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -143,14 +176,15 @@ class _DashboardPageState extends State<DashboardPage> {
   List<dynamic> checkedInList = [];
   getCheckedInCounts(String day) async {
     _countLoading = true;
-    String accessToken = AppData.accessToken;
+    String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
 
     Map<String, dynamic> body = {
-      "Property": {"PropertyID": AppData.propertyId},
+      "Property": {"PropertyID": propertyID},
       "ReportName": "Checked In",
       "Day": day.toString(),
     };
@@ -160,37 +194,69 @@ class _DashboardPageState extends State<DashboardPage> {
 
     print('============CheckedIn count ${day}=========');
     print(response.body);
-    var data = jsonDecode(response.body);
-    // checkinCount = 0;
+    var data;
+    if (response.body.isNotEmpty) {
+      data = jsonDecode(response.body);
+      try {
+        if (response.statusCode == 200) {
+          checkedInList.addAll(data);
+          setState(() {
+            _countLoading = false;
+          });
+        } else {
+        
 
-    if (response.statusCode == 200) {
-      checkedInList.addAll(data);
-      print(data);
-
-      setState(() {
-        _countLoading = false;
-      });
-    } else {
-      Get.snackbar('Something went wrong !',
-          'Something went wrong . Please try again After sometime',
-          backgroundColor: Colors.orange);
-      setState(() {
-        _countLoading = false;
-      });
+          _showErrorSnackbar(context, "Something Occured ! Please restart the App");
+          setState(() {
+            _countLoading = false;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _countLoading = false;
+        });
+      }
     }
+    else{
+      checkedInList.clear();
+      setState(() {
+          _countLoading = false;
+        });
+
+      
+    }
+    
+  }
+
+  
+       void _showErrorSnackbar(BuildContext context , String error ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error),
+        duration: Duration(seconds: 3), // Adjust the duration as needed
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   getDashboardCounts(String day) async {
     _countLoading = true;
     // SharedPreferences prefs = await SharedPreferences.getInstance();
-    String accessToken = AppData.accessToken;
+    String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
+  
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
 
     Map<String, dynamic> body = {
-      "Property": {"PropertyID": AppData.propertyId},
+      "Property": {"PropertyID": propertyID},
       "ReportName": "CountDetails",
       "Day": day.toString(),
     };
@@ -210,19 +276,14 @@ class _DashboardPageState extends State<DashboardPage> {
       blockedCount = data['Blocked'];
       stayoverCount = data['StayOver'];
 
-      print(arrivalCount);
-      print(departureCount);
-      print(bookedCount);
-      print(vacantCount);
-      print(blockedCount);
 
       setState(() {
         _countLoading = false;
       });
     } else {
-      Get.snackbar('Something went wrong !',
-          'Something went wrong . Please try again After sometime',
-          backgroundColor: Colors.orange);
+
+
+      _showErrorSnackbar(context, "Something Occured ! Please restart the App");
       setState(() {
         _countLoading = false;
       });

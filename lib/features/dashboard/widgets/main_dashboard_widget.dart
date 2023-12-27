@@ -172,7 +172,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               child: DashBoardCardWidget(
                   name: "StayOver",
                   image: AppIcons.stayover,
-                  count: widget.arrivalCount,
+                  count: widget.stayoverCount,
                   colorname: Colors.blue)),
           GestureDetector(
             onTap: () {

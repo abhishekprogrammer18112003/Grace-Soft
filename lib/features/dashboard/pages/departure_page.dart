@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -72,18 +72,33 @@ class _DeparturePageState extends State<DeparturePage> {
         ));
   }
 
+  
+       void _showErrorSnackbar(BuildContext context , String error ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error),
+        duration: Duration(seconds: 3), // Adjust the duration as needed
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
   //=========================Departure Api============================
   void getDepartureList(String day) async {
     _loading = true;
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    String accessToken = AppData.accessToken;
+   String? accessToken = await AppData.getAccessToken();
+    int? propertyID = await AppData.getPropertyID();
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
 
     Map<String, dynamic> body = {
-      "Property": {"PropertyID": AppData.propertyId},
+      "Property": {"PropertyID": propertyID},
       "ReportName": "Departure",
       "Day": day.toString(),
     };
@@ -91,22 +106,40 @@ class _DeparturePageState extends State<DeparturePage> {
     http.Response response = await http.post(Uri.parse(STAYOVER_DATA),
         headers: headers, body: jsonEncode(body));
 
-    print('============dashboard count ${day}=========');
-    print(response.body);
-    var data = jsonDecode(response.body);
+    print('============Departure count ${day}=========');
+    var data;
+    if (response.body.isNotEmpty) {
+      data = jsonDecode(response.body);
+      try {
+        if (response.statusCode == 200) {
+          DepartureList.addAll(data);
+          setState(() {
+            _loading = false;
+          });
+        } else {
 
-    if (response.statusCode == 200) {
-      DepartureList.addAll(data);
+
+
+
+          _showErrorSnackbar(context, "Something went wrong ! Please try again . ");
+          setState(() {
+            _loading = false;
+          });
+        }
+      } catch (e) {
+        _showErrorSnackbar(context, e.toString());
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+    else{
+      DepartureList.clear();
       setState(() {
-        _loading = false;
-      });
-    } else {
-      Get.snackbar('Something went wrong !',
-          'Something went wrong . Please try again After sometime',
-          backgroundColor: Colors.orange);
-      setState(() {
-        _loading = false;
-      });
+          _loading = false;
+        });
+
+      
     }
   }
 }
